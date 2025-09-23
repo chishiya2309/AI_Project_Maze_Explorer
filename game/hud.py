@@ -23,4 +23,5 @@ class HUD:
         """Vẽ kết quả game (WIN/LOSE)"""
         if result:
             text_surface = self.big_font.render(result, True, COLOR_HILIGHT)
-            screen.blit(text_surface, text_surface.get_rect(center=(WIDTH//2, 56)))
+            sw, _ = screen.get_size()
+            screen.blit(text_surface, text_surface.get_rect(center=(sw//2, 56)))

@@ -38,10 +38,41 @@ class LevelScene(Scene):
         # HUD
         self.hud = HUD()
 
+        # View/scale state for responsive rendering
+        self.scale = 1.0
+        self.min_scale = 0.5
+        self.max_scale = 3.0
+        self.tile = TILE
+        self.offset_x = GRID_OFFSET_X
+        self.offset_y = GRID_OFFSET_Y
+        self._recompute_layout()
+
+    def _recompute_layout(self):
+        """Recompute tile size and offsets to center the grid for current screen."""
+        screen_w, screen_h = self.game.screen.get_size()
+        # Keep margins for HUD/top area
+        margin_x, margin_y = 32, 80
+        avail_w = max(1, screen_w - margin_x * 2)
+        avail_h = max(1, screen_h - margin_y * 2)
+        fit_tile = max(8, min(avail_w // max(1, self.grid.W), avail_h // max(1, self.grid.H)))
+        self.tile = max(8, int(fit_tile * self.scale))
+        grid_px_w = self.grid.W * self.tile
+        grid_px_h = self.grid.H * self.tile
+        self.offset_x = (screen_w - grid_px_w) // 2
+        self.offset_y = (screen_h - grid_px_h) // 2
+
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
             from game.scenes import LevelSelectScene
             self.game.scenes.switch(LevelSelectScene(self.game))
+        elif e.type == pygame.VIDEORESIZE:
+            self._recompute_layout()
+        elif e.type == pygame.MOUSEWHEEL:
+            if e.y > 0:
+                self.scale = min(self.max_scale, self.scale * 1.1)
+            elif e.y < 0:
+                self.scale = max(self.min_scale, self.scale / 1.1)
+            self._recompute_layout()
 
     def update(self, dt):
         if self.result:
@@ -105,13 +136,13 @@ class LevelScene(Scene):
 
     def _draw_thin_walls(self, screen):
         """Vẽ tường kiểu mỏng theo đường viền"""
-        wall_thickness = 3
+        wall_thickness = max(2, self.tile // 12)
         
         for y in range(self.grid.H):
             for x in range(self.grid.W):
                 if self.grid.get_cell(x, y) == "1":  # Nếu là tường
-                    cell_x = GRID_OFFSET_X + x * TILE
-                    cell_y = GRID_OFFSET_Y + y * TILE
+                    cell_x = self.offset_x + x * self.tile
+                    cell_y = self.offset_y + y * self.tile
                     
                     # Kiểm tra các ô xung quanh
                     top_wall = self.grid.get_cell(x, y-1) == "1"
@@ -122,25 +153,25 @@ class LevelScene(Scene):
                     # Vẽ viền trên
                     if not top_wall:
                         pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x, cell_y, TILE, wall_thickness
+                            cell_x, cell_y, self.tile, wall_thickness
                         ))
                     
                     # Vẽ viền dưới
                     if not bottom_wall:
                         pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x, cell_y + TILE - wall_thickness, TILE, wall_thickness
+                            cell_x, cell_y + self.tile - wall_thickness, self.tile, wall_thickness
                         ))
                     
                     # Vẽ viền trái
                     if not left_wall:
                         pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x, cell_y, wall_thickness, TILE
+                            cell_x, cell_y, wall_thickness, self.tile
                         ))
                     
                     # Vẽ viền phải
                     if not right_wall:
                         pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x + TILE - wall_thickness, cell_y, wall_thickness, TILE
+                            cell_x + self.tile - wall_thickness, cell_y, wall_thickness, self.tile
                         ))
 
     def draw(self, screen):
@@ -151,9 +182,9 @@ class LevelScene(Scene):
             for x in range(self.grid.W):
                 if self.grid.get_cell(x, y) != "1":  # Chỉ vẽ nền cho ô không phải tường
                     pygame.draw.rect(screen, COLOR_PATH, (
-                        GRID_OFFSET_X + x * TILE,
-                        GRID_OFFSET_Y + y * TILE,
-                        TILE, TILE
+                        self.offset_x + x * self.tile,
+                        self.offset_y + y * self.tile,
+                        self.tile, self.tile
                     ))
         
         # Vẽ tường kiểu mỏng
@@ -161,23 +192,24 @@ class LevelScene(Scene):
         
         # Vẽ ngôi sao
         for (x, y) in self.star_collector.get_remaining_stars():
-            cx = GRID_OFFSET_X + x * TILE + TILE // 2
-            cy = GRID_OFFSET_Y + y * TILE + TILE // 2
-            pygame.draw.circle(screen, COLOR_STAR, (cx, cy), TILE // 4)
+            cx = self.offset_x + x * self.tile + self.tile // 2
+            cy = self.offset_y + y * self.tile + self.tile // 2
+            pygame.draw.circle(screen, COLOR_STAR, (cx, cy), max(2, self.tile // 4))
         
         # Vẽ goal
         gx, gy = self.goal
         door_color = COLOR_GOAL_UNLOCK if self.star_collector.is_complete() else COLOR_GOAL_LOCK
+        pad = max(4, self.tile // 6)
         pygame.draw.rect(screen, door_color, (
-            GRID_OFFSET_X + gx * TILE + 6,
-            GRID_OFFSET_Y + gy * TILE + 6,
-            TILE - 12, TILE - 12
-        ), border_radius=6)
+            self.offset_x + gx * self.tile + pad,
+            self.offset_y + gy * self.tile + pad,
+            self.tile - pad * 2, self.tile - pad * 2
+        ), border_radius=max(4, self.tile // 8))
         
         # Vẽ player
-        px = GRID_OFFSET_X + self.player.gx * TILE + TILE // 2
-        py = GRID_OFFSET_Y + self.player.gy * TILE + TILE // 2
-        pygame.draw.circle(screen, COLOR_PLAYER, (px, py), TILE // 3)
+        px = self.offset_x + self.player.gx * self.tile + self.tile // 2
+        py = self.offset_y + self.player.gy * self.tile + self.tile // 2
+        pygame.draw.circle(screen, COLOR_PLAYER, (px, py), max(3, self.tile // 3))
         
         # Vẽ HUD
         self.hud.draw_game_hud(
