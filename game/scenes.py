@@ -24,9 +24,10 @@ class MenuScene(Scene):
         title = self.font_big.render("Maze Explorer", True, COLOR_TEXT)
         tip1 = self.font.render("ENTER: Level Select", True, COLOR_TEXT)
         tip2 = self.font.render("H: History", True, COLOR_TEXT)
-        screen.blit(title, title.get_rect(center=(WIDTH//2, HEIGHT//2-40)))
-        screen.blit(tip1, tip1.get_rect(center=(WIDTH//2, HEIGHT//2+20)))
-        screen.blit(tip2, tip2.get_rect(center=(WIDTH//2, HEIGHT//2+50)))
+        sw, sh = screen.get_size()
+        screen.blit(title, title.get_rect(center=(sw//2, sh//2-40)))
+        screen.blit(tip1, tip1.get_rect(center=(sw//2, sh//2+20)))
+        screen.blit(tip2, tip2.get_rect(center=(sw//2, sh//2+50)))
 
 class HistoryScene(Scene):
     def __init__(self, game):
@@ -104,6 +105,12 @@ class LevelSelectScene(Scene):
         title = self.font_big.render("Level Select", True, COLOR_TEXT)
         screen.blit(title, (48, 32))
         
+        # Layout list responsively: center vertically if short list
+        sw, sh = screen.get_size()
+        start_y = 120
+        total_h = len(self.levels) * 34
+        if start_y + total_h < sh - 40:
+            start_y = (sh - total_h) // 2
         for i, (n, _) in enumerate(self.levels):
             c = COLOR_HILIGHT if i == self.idx else COLOR_TEXT
-            screen.blit(self.font.render(f"{i+1:02d}. {n}", True, c), (64, 120 + i * 34))
+            screen.blit(self.font.render(f"{i+1:02d}. {n}", True, c), (64, start_y + i * 34))

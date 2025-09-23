@@ -5,8 +5,10 @@ from typing import List
 # ================== LEVEL LOADER ==================
 def read_level_txt(path: str) -> List[str]:
     with open(path, "r", encoding="utf-8") as f:
-        rows = [line.rstrip("\n") for line in f if line.strip()]
-    w = max(len(r) for r in rows)
+        # Trim trailing whitespace to avoid unintended extra columns from spaces
+        rows = [line.rstrip().rstrip("\n\r") for line in f if line.strip()]
+    # Recompute width based on trimmed rows
+    w = max(len(r) for r in rows) if rows else 0
     rows = [r.ljust(w, "1") for r in rows]
     return rows
 

@@ -69,13 +69,17 @@ class StatsStore:
 class GameApp:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        # Start resizable; allow toggling fullscreen
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
         pygame.display.set_caption("Maze Explorer")
         self.clock = pygame.time.Clock()
         self.running = True
         self.stats = StatsStore(STATS_FILE)
         # Scene manager will be injected from main
         self.scenes = None
+        # Fullscreen state
+        self.is_fullscreen = False
+        self.windowed_size = (WIDTH, HEIGHT)
 
     def set_scene_manager(self, scene_manager):
         self.scenes = scene_manager
@@ -86,6 +90,19 @@ class GameApp:
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
                     self.running = False
+                elif e.type == pygame.KEYDOWN and e.key == pygame.K_F11:
+                    # Toggle fullscreen
+                    self.is_fullscreen = not self.is_fullscreen
+                    if self.is_fullscreen:
+                        self.windowed_size = self.screen.get_size()
+                        pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+                    else:
+                        pygame.display.set_mode(self.windowed_size, pygame.RESIZABLE)
+                    self.screen = pygame.display.get_surface()
+                elif e.type == pygame.VIDEORESIZE and not self.is_fullscreen:
+                    # Resize window in windowed mode
+                    self.windowed_size = (e.w, e.h)
+                    self.screen = pygame.display.set_mode(self.windowed_size, pygame.RESIZABLE)
                 else:
                     self.scenes.handle_event(e)
             self.scenes.update(dt)
