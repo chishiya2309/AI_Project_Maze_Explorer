@@ -1,6 +1,7 @@
 # maze_explorer/core/assets.py
 import os
 from typing import List
+import pygame
 
 # ================== LEVEL LOADER ==================
 def read_level_txt(path: str) -> List[str]:
@@ -20,3 +21,17 @@ def scan_levels(directory: str):
         if name.endswith(".txt"):
             out.append((name, read_level_txt(os.path.join(directory, name))))
     return out
+
+# ================== IMAGE LOADER ==================
+_image_cache = {}
+
+def load_image(name: str) -> pygame.Surface:
+    """Load image from data/images with caching."""
+    key = name.lower()
+    if key in _image_cache:
+        return _image_cache[key]
+    base_dir = os.path.join("data", "images")
+    path = os.path.join(base_dir, name)
+    surf = pygame.image.load(path).convert_alpha()
+    _image_cache[key] = surf
+    return surf
