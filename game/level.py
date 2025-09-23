@@ -12,6 +12,7 @@ from game.player import Player
 from game.grid import Grid
 from game.collectibles import StarCollector
 from game.hud import HUD
+from core.assets import load_image
 
 class LevelScene(Scene):
     def __init__(self, game, name: str, rows: List[str]):
@@ -37,6 +38,10 @@ class LevelScene(Scene):
         
         # HUD
         self.hud = HUD()
+        # Load images first (needed before layout scaling)
+        self.img_star_base = load_image("star.png")
+        self.img_door_closed_base = load_image("closed_door.png")
+        self.img_door_open_base = load_image("open_door.png")
 
         # View/scale state for responsive rendering
         self.scale = 1.0
@@ -60,6 +65,20 @@ class LevelScene(Scene):
         grid_px_h = self.grid.H * self.tile
         self.offset_x = (screen_w - grid_px_w) // 2
         self.offset_y = (screen_h - grid_px_h) // 2
+        self._rescale_sprites()
+
+    def _rescale_sprites(self):
+        """Scale cached images to current tile size."""
+        # Doors fill the tile with small padding similar to previous rectangle
+        pad = max(4, self.tile // 6)
+        door_size = max(1, self.tile - pad * 2)
+        self.door_pad = pad
+        self.img_door_closed = pygame.transform.smoothscale(self.img_door_closed_base, (door_size, door_size))
+        self.img_door_open = pygame.transform.smoothscale(self.img_door_open_base, (door_size, door_size))
+        # Star takes about half of the tile
+        star_size = max(2, self.tile // 2)
+        self.img_star = pygame.transform.smoothscale(self.img_star_base, (star_size, star_size))
+        self.star_half = star_size // 2
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
@@ -190,21 +209,21 @@ class LevelScene(Scene):
         # Vẽ tường kiểu mỏng
         self._draw_thin_walls(screen)
         
-        # Vẽ ngôi sao
+        # Vẽ ngôi sao bằng ảnh
         for (x, y) in self.star_collector.get_remaining_stars():
             cx = self.offset_x + x * self.tile + self.tile // 2
             cy = self.offset_y + y * self.tile + self.tile // 2
-            pygame.draw.circle(screen, COLOR_STAR, (cx, cy), max(2, self.tile // 4))
+            screen.blit(self.img_star, (cx - self.star_half, cy - self.star_half))
         
         # Vẽ goal
         gx, gy = self.goal
-        door_color = COLOR_GOAL_UNLOCK if self.star_collector.is_complete() else COLOR_GOAL_LOCK
-        pad = max(4, self.tile // 6)
-        pygame.draw.rect(screen, door_color, (
+        is_open = self.star_collector.is_complete()
+        img = self.img_door_open if is_open else self.img_door_closed
+        pad = self.door_pad
+        screen.blit(img, (
             self.offset_x + gx * self.tile + pad,
-            self.offset_y + gy * self.tile + pad,
-            self.tile - pad * 2, self.tile - pad * 2
-        ), border_radius=max(4, self.tile // 8))
+            self.offset_y + gy * self.tile + pad
+        ))
         
         # Vẽ player
         px = self.offset_x + self.player.gx * self.tile + self.tile // 2
