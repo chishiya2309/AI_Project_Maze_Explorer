@@ -89,6 +89,16 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 184
+    },
+    {
+      "ts": 1758680770.5291493,
+      "level_name": "level04.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 68,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 256
     }
   ]
 }
