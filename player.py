@@ -1,6 +1,6 @@
 import pygame
 
-SPEED = 10
+SPEED = 20
 
 class Player:
     def __init__(self, x, y, images, cell_size):
