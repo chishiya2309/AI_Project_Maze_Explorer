@@ -8,11 +8,19 @@ class AIController:
         self.active: Optional[str] = None  # "BFS" | others in tương lai
         self.moves: List[str] = []
         self.move_index: int = 0
+        # Progressive visited visualization state
+        self._visited_order: List[Tuple[int, int]] = []
+        self._reveal_index: int = 0
+        self._reveal_acc_ms: int = 0
+        self._reveal_interval_ms: int = 30  # tốc độ loang (ms mỗi ô)
 
     def reset(self):
         self.active = None
         self.moves = []
         self.move_index = 0
+        self._visited_order = []
+        self._reveal_index = 0
+        self._reveal_acc_ms = 0
 
     def _build_rows_from_scene(self, level_scene) -> List[str]:
         # Tạo lưới ký tự từ scene hiện tại: sử dụng tường từ grid, sao theo remaining, S/G theo vị trí hiện tại
@@ -48,6 +56,10 @@ class AIController:
         # moves là danh sách 'U','D','L','R'
         self.moves = res.get("moves", [])
         self.move_index = 0
+        # compute visited order separately for progressive flood visualization
+        self._visited_order = self._compute_bfs_visited(rows)
+        self._reveal_index = 0
+        self._reveal_acc_ms = 0
 
     def handle_event(self, e, level_scene):
         if e.type != pygame.KEYDOWN:
@@ -79,5 +91,78 @@ class AIController:
         if move == "R":
             return (1, 0)
         return None
+
+    def update(self, dt_ms: int):
+        """Cập nhật tiến độ loang theo thời gian (ms)."""
+        if self.active is None or not self._visited_order:
+            return
+        self._reveal_acc_ms += dt_ms
+        while self._reveal_acc_ms >= self._reveal_interval_ms and self._reveal_index < len(self._visited_order):
+            self._reveal_acc_ms -= self._reveal_interval_ms
+            self._reveal_index += 1
+
+    def get_revealed_visited(self) -> List[Tuple[int, int]]:
+        """Các ô đã được hé lộ (phục vụ vẽ overlay)."""
+        if not self._visited_order:
+            return []
+        upto = max(0, min(self._reveal_index, len(self._visited_order)))
+        return self._visited_order[:upto]
+
+    def _compute_bfs_visited(self, rows: List[str]) -> List[Tuple[int, int]]:
+        """Tính thứ tự ô được duyệt (pop từ queue) của BFS với không gian trạng thái gồm sao.
+        Không trả về đường đi; chỉ trả về visited order để vẽ loang.
+        """
+        H = len(rows)
+        W = len(rows[0]) if H > 0 else 0
+        start = None
+        goal = None
+        stars: List[Tuple[int, int]] = []
+        for y in range(H):
+            for x in range(W):
+                ch = rows[y][x]
+                if ch == "S":
+                    start = (x, y)
+                elif ch == "G":
+                    goal = (x, y)
+                elif ch == "*":
+                    stars.append((x, y))
+        if start is None or goal is None:
+            return []
+
+        star_index = {pos: i for i, pos in enumerate(stars)}
+        all_mask = (1 << len(stars)) - 1
+
+        def blocked(x: int, y: int) -> bool:
+            return x < 0 or y < 0 or x >= W or y >= H or rows[y][x] == "1"
+
+        from collections import deque
+        State = Tuple[int, int, int]
+        q = deque()
+        visited = set()
+        order: List[Tuple[int, int]] = []
+        s: State = (start[0], start[1], 0)
+        q.append(s)
+        visited.add(s)
+        dirs = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+
+        while q:
+            x, y, mask = q.popleft()
+            order.append((x, y))
+            if (x, y) == goal and mask == all_mask:
+                # có thể dừng sớm tại đích khi đủ sao
+                break
+            for dx, dy in dirs:
+                nx, ny = x + dx, y + dy
+                if blocked(nx, ny):
+                    continue
+                nmask = mask
+                if (nx, ny) in star_index:
+                    nmask |= (1 << star_index[(nx, ny)])
+                st: State = (nx, ny, nmask)
+                if st in visited:
+                    continue
+                visited.add(st)
+                q.append(st)
+        return order
 
 

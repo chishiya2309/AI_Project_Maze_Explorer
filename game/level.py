@@ -111,6 +111,8 @@ class LevelScene(Scene):
         self.time_elapsed += dt
         keys = pygame.key.get_pressed()
         self.cool -= dt
+        # Cập nhật tiến độ loang của AI
+        self.ai.update(dt)
         
         if self.cool <= 0:
             dx = dy = 0
@@ -266,3 +268,20 @@ class LevelScene(Scene):
             bg_rect = rect.inflate(12, 8)
             pygame.draw.rect(screen, (0, 0, 0, 0), bg_rect)  # opaque dark bg
             screen.blit(surf, rect)
+
+        # Vẽ overlay loang dần: chỉ vẽ phần đã hé lộ
+        if self.ai.active == "BFS":
+            revealed = self.ai.get_revealed_visited()
+            if revealed:
+                overlay_color = (255, 255, 255)
+                border = max(1, self.tile // 12)
+                for (vx, vy) in revealed:
+                    if self.grid.get_cell(vx, vy) == "1":
+                        continue
+                    rect = pygame.Rect(
+                        self.offset_x + vx * self.tile,
+                        self.offset_y + vy * self.tile,
+                        self.tile,
+                        self.tile,
+                    )
+                    pygame.draw.rect(screen, overlay_color, rect, border)
