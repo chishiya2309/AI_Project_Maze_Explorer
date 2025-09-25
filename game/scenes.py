@@ -451,6 +451,12 @@ class HistoryScene(Scene):
         steps_text = f"Steps: {record.steps}"
         steps_surface = self.font_small.render(steps_text, True, self.color_card_text)
         screen.blit(steps_surface, (x + w - 120, y + 50))
+
+        # Solver (nếu có)
+        if hasattr(record, 'solver'):
+            solver_text = f"Solver: {record.solver}"
+            solver_surface = self.font_tiny.render(solver_text, True, self.color_stats)
+            screen.blit(solver_surface, (x + w - 220, y + 15))
     
     def _draw_scroll_indicator(self, screen, sw, sh):
         """Draw scroll indicator and position info"""

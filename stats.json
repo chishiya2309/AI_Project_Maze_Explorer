@@ -8,7 +8,8 @@
       "time_elapsed_sec": 2,
       "stars_collected": 0,
       "stars_total": 0,
-      "steps": 11
+      "steps": 11,
+      "solver": "HUMAN"
     },
     {
       "ts": 1758162131.5811179,
@@ -18,7 +19,8 @@
       "time_elapsed_sec": 3,
       "stars_collected": 0,
       "stars_total": 0,
-      "steps": 17
+      "steps": 17,
+      "solver": "HUMAN"
     },
     {
       "ts": 1758162209.3833337,
@@ -28,7 +30,8 @@
       "time_elapsed_sec": 2,
       "stars_collected": 1,
       "stars_total": 1,
-      "steps": 11
+      "steps": 11,
+      "solver": "HUMAN"
     },
     {
       "ts": 1758163079.3005035,
@@ -38,7 +41,8 @@
       "time_elapsed_sec": 15,
       "stars_collected": 3,
       "stars_total": 3,
-      "steps": 65
+      "steps": 65,
+      "solver": "HUMAN"
     },
     {
       "ts": 1758165124.0720928,
@@ -48,7 +52,8 @@
       "time_elapsed_sec": 38,
       "stars_collected": 3,
       "stars_total": 3,
-      "steps": 68
+      "steps": 68,
+      "solver": "HUMAN"
     },
     {
       "ts": 1758165378.6563382,
@@ -58,7 +63,8 @@
       "time_elapsed_sec": 59,
       "stars_collected": 3,
       "stars_total": 3,
-      "steps": 222
+      "steps": 222,
+      "solver": "HUMAN"
     },
     {
       "ts": 1758172957.1742978,
@@ -68,7 +74,8 @@
       "time_elapsed_sec": 16,
       "stars_collected": 3,
       "stars_total": 3,
-      "steps": 70
+      "steps": 70,
+      "solver": "HUMAN"
     },
     {
       "ts": 1758631610.8310177,
@@ -78,7 +85,8 @@
       "time_elapsed_sec": 25,
       "stars_collected": 3,
       "stars_total": 3,
-      "steps": 128
+      "steps": 128,
+      "solver": "HUMAN"
     },
     {
       "ts": 1758639628.7819479,
@@ -88,7 +96,8 @@
       "time_elapsed_sec": 43,
       "stars_collected": 3,
       "stars_total": 3,
-      "steps": 184
+      "steps": 184,
+      "solver": "HUMAN"
     },
     {
       "ts": 1758680770.5291493,
@@ -98,7 +107,63 @@
       "time_elapsed_sec": 68,
       "stars_collected": 3,
       "stars_total": 3,
-      "steps": 256
+      "steps": 256,
+      "solver": "HUMAN"
+    },
+    {
+      "ts": 1758781013.3141189,
+      "level_name": "level02.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 53,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 264,
+      "solver": "HUMAN"
+    },
+    {
+      "ts": 1758781141.4946663,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 124,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 574,
+      "solver": "HUMAN"
+    },
+    {
+      "ts": 1758782462.5159137,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 38,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 332,
+      "solver": "HUMAN"
+    },
+    {
+      "ts": 1758782770.1053696,
+      "level_name": "level01.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 7,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 60,
+      "solver": "HUMAN"
+    },
+    {
+      "ts": 1758782925.189113,
+      "level_name": "level01.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 7,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 60,
+      "solver": "BFS"
     }
   ]
 }

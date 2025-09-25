@@ -39,6 +39,7 @@ class PlayRecord:
     stars_collected: int
     stars_total: int
     steps: int
+    solver: str = "HUMAN"  # HUMAN | BFS | ...
 
 class StatsStore:
     def __init__(self, path: str):

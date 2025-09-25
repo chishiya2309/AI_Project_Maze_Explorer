@@ -13,6 +13,7 @@ from game.grid import Grid
 from game.collectibles import StarCollector
 from game.hud import HUD
 from core.assets import load_image
+from game.ai_control import AIController
 
 class LevelScene(Scene):
     def __init__(self, game, name: str, rows: List[str]):
@@ -51,6 +52,10 @@ class LevelScene(Scene):
         self.offset_x = GRID_OFFSET_X
         self.offset_y = GRID_OFFSET_Y
         self._recompute_layout()
+        # AI controller (mặc định: người chơi điều khiển)
+        self.ai = AIController()
+        # Font hiển thị trạng thái AI
+        self.font_ai = pygame.font.SysFont("segoeui", 18, bold=True)
 
     def _recompute_layout(self):
         """Recompute tile size and offsets to center the grid for current screen."""
@@ -92,6 +97,8 @@ class LevelScene(Scene):
             elif e.y < 0:
                 self.scale = max(self.min_scale, self.scale / 1.1)
             self._recompute_layout()
+        # Bắt phím chọn thuật toán (1 = BFS; số khác: tắt AI)
+        self.ai.handle_event(e, self)
 
     def update(self, dt):
         if self.result:
@@ -107,14 +114,20 @@ class LevelScene(Scene):
         
         if self.cool <= 0:
             dx = dy = 0
-            if keys[pygame.K_LEFT]:
-                dx = -1
-            elif keys[pygame.K_RIGHT]:
-                dx = 1
-            elif keys[pygame.K_UP]:
-                dy = -1
-            elif keys[pygame.K_DOWN]:
-                dy = 1
+            # Nếu AI đang hoạt động thì lấy bước kế tiếp từ AI
+            step = self.ai.get_next_step()
+            if step is not None:
+                dx, dy = step
+            else:
+                # Người chơi điều khiển
+                if keys[pygame.K_LEFT]:
+                    dx = -1
+                elif keys[pygame.K_RIGHT]:
+                    dx = 1
+                elif keys[pygame.K_UP]:
+                    dy = -1
+                elif keys[pygame.K_DOWN]:
+                    dy = 1
             
             if dx or dy:
                 nx, ny = self.player.gx + dx, self.player.gy + dy
@@ -149,7 +162,8 @@ class LevelScene(Scene):
             time_elapsed_sec=int(self.time_elapsed // 1000),
             stars_collected=self.star_collector.stars_collected,
             stars_total=self.star_collector.stars_total,
-            steps=self.steps
+            steps=self.steps,
+            solver=(self.ai.active if self.ai.active else "HUMAN")
         )
         self.game.stats.add(rec)
 
@@ -239,3 +253,16 @@ class LevelScene(Scene):
         
         # Vẽ kết quả
         self.hud.draw_result(screen, self.result)
+
+        # Hiển thị trạng thái AI (góc trên bên phải)
+        if self.ai.active:
+            label = "thuật toán BFS" if self.ai.active == "BFS" else f"AI: {self.ai.active}"
+            surf = self.font_ai.render(label, True, (255, 255, 255))
+            sw, _ = screen.get_size()
+            rect = surf.get_rect()
+            rect.top = 10
+            rect.right = sw - 12
+            # nền mờ để dễ đọc
+            bg_rect = rect.inflate(12, 8)
+            pygame.draw.rect(screen, (0, 0, 0, 0), bg_rect)  # opaque dark bg
+            screen.blit(surf, rect)
