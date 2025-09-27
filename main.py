@@ -1,4 +1,3 @@
-# maze_explorer/main.py
 """
 Maze Explorer - Game mê cung với hệ thống thu thập sao và lưu điểm
 Refactored để dễ bảo trì và mở rộng
