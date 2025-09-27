@@ -60,16 +60,18 @@ class LevelScene(Scene):
     def _recompute_layout(self):
         """Recompute tile size and offsets to center the grid for current screen."""
         screen_w, screen_h = self.game.screen.get_size()
-        # Keep margins for HUD/top area
-        margin_x, margin_y = 32, 80
+        # Keep margins for header only (no footer)
+        header_height = 80
+        margin_x = 32
+        margin_y = 32
         avail_w = max(1, screen_w - margin_x * 2)
-        avail_h = max(1, screen_h - margin_y * 2)
+        avail_h = max(1, screen_h - header_height - margin_y * 2)
         fit_tile = max(8, min(avail_w // max(1, self.grid.W), avail_h // max(1, self.grid.H)))
         self.tile = max(8, int(fit_tile * self.scale))
         grid_px_w = self.grid.W * self.tile
         grid_px_h = self.grid.H * self.tile
         self.offset_x = (screen_w - grid_px_w) // 2
-        self.offset_y = (screen_h - grid_px_h) // 2
+        self.offset_y = header_height + (avail_h - grid_px_h) // 2
         self._rescale_sprites()
 
     def _rescale_sprites(self):
@@ -89,6 +91,15 @@ class LevelScene(Scene):
         if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
             from game.scenes import LevelSelectScene
             self.game.scenes.switch(LevelSelectScene(self.game))
+        elif e.type == pygame.MOUSEBUTTONDOWN:
+            if e.button == 1:  # Left click
+                mouse_x, mouse_y = e.pos
+                # Check if clicking on Back button
+                back_rect = pygame.Rect(20, 20, 80, 40)
+                if back_rect.collidepoint(mouse_x, mouse_y):
+                    from game.scenes import LevelSelectScene
+                    self.game.scenes.switch(LevelSelectScene(self.game))
+                    return
         elif e.type == pygame.VIDEORESIZE:
             self._recompute_layout()
         elif e.type == pygame.MOUSEWHEEL:
@@ -169,7 +180,7 @@ class LevelScene(Scene):
 
     def _draw_thin_walls(self, screen):
         """Vẽ tường kiểu mỏng theo đường viền"""
-        wall_thickness = max(2, self.tile // 12)
+        wall_thickness = max(1, self.tile // 16)  # Tường mỏng hơn
         
         for y in range(self.grid.H):
             for x in range(self.grid.W):
@@ -254,14 +265,15 @@ class LevelScene(Scene):
         # Vẽ kết quả
         self.hud.draw_result(screen, self.result)
 
-        # Hiển thị trạng thái AI (góc trên bên phải)
+        # Hiển thị trạng thái AI (phía dưới header level, bên phải)
         if self.ai.active:
             label = "thuật toán BFS" if self.ai.active == "BFS" else f"AI: {self.ai.active}"
             surf = self.font_ai.render(label, True, (255, 255, 255))
-            sw, _ = screen.get_size()
+            sw, sh = screen.get_size()
             rect = surf.get_rect()
-            rect.top = 10
-            rect.right = sw - 12
+            # Đặt ở phía dưới header (80px) và bên phải
+            rect.top = 90  # Dưới header 80px + 10px margin
+            rect.right = sw - 20
             # nền mờ để dễ đọc
             bg_rect = rect.inflate(12, 8)
             pygame.draw.rect(screen, (0, 0, 0, 0), bg_rect)  # opaque dark bg

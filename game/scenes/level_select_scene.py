@@ -60,7 +60,9 @@ class LevelSelectScene(Scene):
                 if self.levels:
                     name, rows = self.levels[self.selected_level]
                     from game.level import LevelScene
-                    self.game.scenes.switch(LevelScene(self.game, name, rows))
+                    # Sử dụng tên đẹp thay vì tên file
+                    level_display_name = f"Level {self.selected_level + 1}"
+                    self.game.scenes.switch(LevelScene(self.game, level_display_name, rows))
         elif e.type == pygame.MOUSEBUTTONDOWN:
             if e.button == 1:  # Left click
                 mouse_x, mouse_y = e.pos
@@ -109,7 +111,9 @@ class LevelSelectScene(Scene):
                 self.selected_level = i
                 # Start the level
                 from game.level import LevelScene
-                self.game.scenes.switch(LevelScene(self.game, name, self.levels[i][1]))
+                # Sử dụng tên đẹp thay vì tên file
+                level_display_name = f"Level {i + 1}"
+                self.game.scenes.switch(LevelScene(self.game, level_display_name, self.levels[i][1]))
                 break
     
     def _check_card_hover(self, mouse_x, mouse_y, sw, sh):
