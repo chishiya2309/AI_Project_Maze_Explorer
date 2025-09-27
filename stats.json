@@ -351,6 +351,50 @@
       "stars_total": 2,
       "steps": 54,
       "solver": "BFS"
+    },
+    {
+      "ts": 1758948039.679602,
+      "level_name": "level07.txt",
+      "result": "WIN",
+      "score": 0,
+      "time_elapsed_sec": 6,
+      "stars_collected": 0,
+      "stars_total": 0,
+      "steps": 56,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758983674.658556,
+      "level_name": "level07.txt",
+      "result": "WIN",
+      "score": 10,
+      "time_elapsed_sec": 9,
+      "stars_collected": 1,
+      "stars_total": 1,
+      "steps": 60,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758983888.5935993,
+      "level_name": "level07.txt",
+      "result": "WIN",
+      "score": 20,
+      "time_elapsed_sec": 18,
+      "stars_collected": 2,
+      "stars_total": 2,
+      "steps": 138,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758984867.2348409,
+      "level_name": "level07.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 30,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 256,
+      "solver": "BFS"
     }
   ]
 }

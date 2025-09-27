@@ -295,8 +295,12 @@ class EditMapScene(Scene):
                 timestamp = int(time.time())
                 filename = f"data/levels/level_custom_{timestamp}.txt"
             else:
-                # For existing levels, save to the original file
-                filename = f"data/levels/{self.level_name}.txt"
+                # For existing levels, save to the original file (ghi đè lên file cũ)
+                # Đảm bảo tên file có extension .txt
+                if not self.level_name.endswith('.txt'):
+                    filename = f"data/levels/{self.level_name}.txt"
+                else:
+                    filename = f"data/levels/{self.level_name}"
             
             with open(filename, 'w') as f:
                 for row in self.grid:
