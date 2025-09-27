@@ -63,7 +63,7 @@ class MenuScene(Scene):
         elif self.selected_button == 1:  # History
             self.game.scenes.switch(HistoryScene(self.game))
         elif self.selected_button == 2:  # Edit Map
-            self.game.scenes.switch(EditMapScene(self.game))
+            self.game.scenes.switch(EditLevelSelectScene(self.game))
         elif self.selected_button == 3:  # Quit
             self.game.running = False
     
@@ -693,9 +693,264 @@ class LevelSelectScene(Scene):
             level_rect = level_surface.get_rect(center=(card_x + self.card_width // 2, card_y + self.card_height // 2))
             screen.blit(level_surface, level_rect)
 
-class EditMapScene(Scene):
+class EditLevelSelectScene(Scene):
     def __init__(self, game):
         super().__init__(game)
+        self.font_title = pygame.font.SysFont("segoeui", 48, bold=True)
+        self.font_button = pygame.font.SysFont("segoeui", 24, bold=True)
+        self.font_level = pygame.font.SysFont("segoeui", 20, bold=True)
+        self.font_small = pygame.font.SysFont("segoeui", 18, bold=True)
+        self.levels = scan_levels("data/levels")
+        self.selected_level = 0
+        self.hovered_level = -1  # Track which level is being hovered
+        self.hovered_back = False  # Track if back button is hovered
+        
+        # Colors
+        self.color_bg = (20, 40, 30)  # Dark green background
+        self.color_bg_pattern = (15, 35, 25)  # Darker green for pattern
+        self.color_title = (255, 255, 255)  # White title
+        
+        # Back button colors
+        self.color_back_button = (100, 200, 100)  # Green back button
+        self.color_back_button_hover = (120, 220, 120)  # Lighter green for hover
+        self.color_back_button_text = (255, 255, 255)  # White text
+        
+        # Card colors
+        self.color_card_bg = (40, 80, 60)  # Dark teal card background
+        self.color_card_hover = (60, 120, 80)  # Lighter teal for hover
+        self.color_card_selected = (80, 160, 100)  # Even lighter for selected
+        self.color_card_text = (255, 255, 255)  # White text on cards
+        self.color_card_border = (80, 160, 100)  # Border color
+        self.color_card_border_hover = (120, 200, 140)  # Brighter border for hover
+        
+        # New Map card colors (special styling)
+        self.color_new_map_bg = (60, 40, 80)  # Purple background for new map
+        self.color_new_map_hover = (80, 60, 100)  # Lighter purple for hover
+        self.color_new_map_selected = (100, 80, 120)  # Even lighter for selected
+        self.color_new_map_border = (120, 80, 160)  # Purple border
+        self.color_new_map_border_hover = (160, 120, 200)  # Brighter purple border
+        
+        # Card layout
+        self.cards_per_row = 4
+        self.card_width = 150
+        self.card_height = 100
+        self.card_spacing = 20
+        self.card_margin = 50
+        
+        # Total cards = levels + 1 (for new map)
+        self.total_cards = len(self.levels) + 1
+    
+    def handle_event(self, e):
+        if e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_ESCAPE:
+                self.game.scenes.switch(MenuScene(self.game))
+            elif e.key in (pygame.K_LEFT, pygame.K_a):
+                if self.selected_level > 0:
+                    self.selected_level -= 1
+            elif e.key in (pygame.K_RIGHT, pygame.K_d):
+                if self.selected_level < self.total_cards - 1:
+                    self.selected_level += 1
+            elif e.key in (pygame.K_UP, pygame.K_w):
+                if self.selected_level >= self.cards_per_row:
+                    self.selected_level -= self.cards_per_row
+            elif e.key in (pygame.K_DOWN, pygame.K_s):
+                if self.selected_level + self.cards_per_row < self.total_cards:
+                    self.selected_level += self.cards_per_row
+            elif e.key in (pygame.K_RETURN, pygame.K_SPACE):
+                self._activate_selected_card()
+        elif e.type == pygame.MOUSEBUTTONDOWN:
+            if e.button == 1:  # Left click
+                mouse_x, mouse_y = e.pos
+                sw, sh = self.game.screen.get_size()
+                
+                # Check back button
+                back_rect = pygame.Rect(30, 30, 80, 40)
+                if back_rect.collidepoint(mouse_x, mouse_y):
+                    self.game.scenes.switch(MenuScene(self.game))
+                    return
+                
+                # Check level cards
+                self._check_card_click(mouse_x, mouse_y, sw, sh)
+        elif e.type == pygame.MOUSEMOTION:
+            mouse_x, mouse_y = e.pos
+            sw, sh = self.game.screen.get_size()
+            
+            # Check if hovering over back button
+            back_rect = pygame.Rect(30, 30, 80, 40)
+            self.hovered_back = back_rect.collidepoint(mouse_x, mouse_y)
+            
+            # Check if hovering over any card
+            self.hovered_level = self._check_card_hover(mouse_x, mouse_y, sw, sh)
+            
+            # Set cursor based on hover state
+            if self.hovered_back or self.hovered_level >= 0:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+    
+    def _activate_selected_card(self):
+        """Activate the selected card"""
+        if self.selected_level < len(self.levels):
+            # Edit existing level
+            name, rows = self.levels[self.selected_level]
+            self.game.scenes.switch(EditMapScene(self.game, name, rows))
+        else:
+            # Create new map
+            self.game.scenes.switch(EditMapScene(self.game, "new_map", None))
+    
+    def _check_card_click(self, mouse_x, mouse_y, sw, sh):
+        """Check if mouse clicked on a level card"""
+        start_x = (sw - (self.cards_per_row * self.card_width + (self.cards_per_row - 1) * self.card_spacing)) // 2
+        start_y = sh // 2 - 50
+        
+        for i in range(self.total_cards):
+            row = i // self.cards_per_row
+            col = i % self.cards_per_row
+            
+            card_x = start_x + col * (self.card_width + self.card_spacing)
+            card_y = start_y + row * (self.card_height + self.card_spacing)
+            
+            card_rect = pygame.Rect(card_x, card_y, self.card_width, self.card_height)
+            if card_rect.collidepoint(mouse_x, mouse_y):
+                self.selected_level = i
+                self._activate_selected_card()
+                break
+    
+    def _check_card_hover(self, mouse_x, mouse_y, sw, sh):
+        """Check if mouse is hovering over any card and return card index"""
+        start_x = (sw - (self.cards_per_row * self.card_width + (self.cards_per_row - 1) * self.card_spacing)) // 2
+        start_y = sh // 2 - 50
+        
+        for i in range(self.total_cards):
+            row = i // self.cards_per_row
+            col = i % self.cards_per_row
+            
+            card_x = start_x + col * (self.card_width + self.card_spacing)
+            card_y = start_y + row * (self.card_height + self.card_spacing)
+            
+            card_rect = pygame.Rect(card_x, card_y, self.card_width, self.card_height)
+            if card_rect.collidepoint(mouse_x, mouse_y):
+                return i
+        return -1
+    
+    def draw(self, screen):
+        # Background with pattern
+        screen.fill(self.color_bg)
+        sw, sh = screen.get_size()
+        
+        # Draw subtle pattern
+        for y in range(0, sh, 20):
+            for x in range(0, sw, 20):
+                if (x + y) % 40 == 0:
+                    pygame.draw.rect(screen, self.color_bg_pattern, (x, y, 20, 20))
+        
+        # Back button
+        back_rect = pygame.Rect(30, 30, 80, 40)
+        back_color = self.color_back_button_hover if self.hovered_back else self.color_back_button
+        pygame.draw.rect(screen, back_color, back_rect, border_radius=8)
+        
+        # Add subtle border for hover effect
+        if self.hovered_back:
+            pygame.draw.rect(screen, (150, 250, 150), back_rect, 2, border_radius=8)
+        
+        back_text = self.font_button.render("Back", True, self.color_back_button_text)
+        back_text_rect = back_text.get_rect(center=back_rect.center)
+        screen.blit(back_text, back_text_rect)
+        
+        # Title
+        title_text = self.font_title.render("Edit Map", True, self.color_title)
+        title_rect = title_text.get_rect(center=(sw // 2, 80))
+        screen.blit(title_text, title_rect)
+        
+        # Level cards
+        if not self.levels:
+            return
+            
+        # Calculate card positions
+        start_x = (sw - (self.cards_per_row * self.card_width + (self.cards_per_row - 1) * self.card_spacing)) // 2
+        start_y = sh // 2 - 50
+        
+        # Draw existing level cards
+        for i, (name, _) in enumerate(self.levels):
+            row = i // self.cards_per_row
+            col = i % self.cards_per_row
+            
+            card_x = start_x + col * (self.card_width + self.card_spacing)
+            card_y = start_y + row * (self.card_height + self.card_spacing)
+            
+            # Card background
+            card_rect = pygame.Rect(card_x, card_y, self.card_width, self.card_height)
+            
+            # Determine card color based on state
+            if i == self.selected_level:
+                # Selected card (keyboard selection)
+                card_color = self.color_card_selected
+                border_color = self.color_card_border
+                border_width = 3
+            elif i == self.hovered_level:
+                # Hovered card (mouse hover)
+                card_color = self.color_card_hover
+                border_color = self.color_card_border_hover
+                border_width = 3
+            else:
+                # Normal card
+                card_color = self.color_card_bg
+                border_color = self.color_card_border
+                border_width = 2
+            
+            # Draw card background
+            pygame.draw.rect(screen, card_color, card_rect, border_radius=12)
+            pygame.draw.rect(screen, border_color, card_rect, border_width, border_radius=12)
+            
+            # Level text
+            level_text = f"Level {i + 1}"
+            level_surface = self.font_level.render(level_text, True, self.color_card_text)
+            level_rect = level_surface.get_rect(center=(card_x + self.card_width // 2, card_y + self.card_height // 2))
+            screen.blit(level_surface, level_rect)
+        
+        # Draw "New Map" card
+        new_map_index = len(self.levels)
+        row = new_map_index // self.cards_per_row
+        col = new_map_index % self.cards_per_row
+        
+        card_x = start_x + col * (self.card_width + self.card_spacing)
+        card_y = start_y + row * (self.card_height + self.card_spacing)
+        
+        # Card background
+        card_rect = pygame.Rect(card_x, card_y, self.card_width, self.card_height)
+        
+        # Determine card color based on state (special colors for new map)
+        if new_map_index == self.selected_level:
+            # Selected card (keyboard selection)
+            card_color = self.color_new_map_selected
+            border_color = self.color_new_map_border
+            border_width = 3
+        elif new_map_index == self.hovered_level:
+            # Hovered card (mouse hover)
+            card_color = self.color_new_map_hover
+            border_color = self.color_new_map_border_hover
+            border_width = 3
+        else:
+            # Normal card
+            card_color = self.color_new_map_bg
+            border_color = self.color_new_map_border
+            border_width = 2
+        
+        # Draw card background
+        pygame.draw.rect(screen, card_color, card_rect, border_radius=12)
+        pygame.draw.rect(screen, border_color, card_rect, border_width, border_radius=12)
+        
+        # New Map text
+        new_map_text = "New Map"
+        new_map_surface = self.font_small.render(new_map_text, True, self.color_card_text)
+        new_map_rect = new_map_surface.get_rect(center=(card_x + self.card_width // 2, card_y + self.card_height // 2))
+        screen.blit(new_map_surface, new_map_rect)
+
+class EditMapScene(Scene):
+    def __init__(self, game, level_name="new_map", existing_rows=None):
+        super().__init__(game)
+        self.level_name = level_name
+        self.existing_rows = existing_rows
         self.font_title = pygame.font.SysFont("segoeui", 48, bold=True)
         self.font_button = pygame.font.SysFont("segoeui", 24, bold=True)
         self.font_small = pygame.font.SysFont("segoeui", 18)
@@ -718,13 +973,21 @@ class EditMapScene(Scene):
         self.color_star = (255, 255, 100)  # Star color (yellow)
         self.color_selected = (255, 200, 100)  # Selected cell (orange)
         
-        # Grid settings
-        self.grid_size = 20
-        self.grid_width = 15
-        self.grid_height = 15
+        # Grid settings - will be set dynamically based on loaded level
+        self.grid_width = 15  # Default size
+        self.grid_height = 15  # Default size
         self.cell_size = 25
+        self.min_cell_size = 10  # Minimum cell size for zoom out
+        self.max_cell_size = 50  # Maximum cell size for zoom in
         self.grid_x = 50
         self.grid_y = 100
+        
+        # Zoom and scroll settings
+        self.zoom_level = 1.0
+        self.scroll_x = 0
+        self.scroll_y = 0
+        self.dragging_scroll = False
+        self.last_mouse_pos = (0, 0)
         
         # Editor state
         self.selected_tool = 0  # 0=Wall, 1=Floor, 2=Start, 3=Goal, 4=Star
@@ -734,6 +997,69 @@ class EditMapScene(Scene):
         # Grid data (0=floor, 1=wall, S=start, G=goal, *=star)
         self.grid = [['0' for _ in range(self.grid_width)] for _ in range(self.grid_height)]
         
+        if self.existing_rows:
+            # Load existing level
+            self._load_existing_level()
+        else:
+            # Create new level with default setup
+            self._setup_new_level()
+        
+        self.hovered_back = False
+        self.hovered_cell = None
+        self.dragging = False
+    
+    def _load_existing_level(self):
+        """Load an existing level into the grid"""
+        if not self.existing_rows:
+            return
+        
+        # Get actual dimensions of the level
+        actual_height = len(self.existing_rows)
+        actual_width = len(self.existing_rows[0]) if self.existing_rows else 0
+        
+        # Update grid dimensions to match the actual level
+        self.grid_width = actual_width
+        self.grid_height = actual_height
+        
+        # Recreate grid with correct dimensions
+        self.grid = [['0' for _ in range(self.grid_width)] for _ in range(self.grid_height)]
+        
+        # Load existing level data
+        for y, row in enumerate(self.existing_rows):
+            if y < self.grid_height:
+                for x, char in enumerate(row):
+                    if x < self.grid_width:
+                        self.grid[y][x] = char
+        
+        # Center the grid on screen
+        self._center_grid()
+    
+    def _center_grid(self):
+        """Center the grid on the screen"""
+        # Get screen dimensions (we'll get them in the draw method)
+        # For now, set default centering
+        self.grid_x = 50
+        self.grid_y = 100
+    
+    def _update_grid_position(self, screen_width, screen_height):
+        """Update grid position to center it on screen"""
+        # Calculate actual cell size based on zoom
+        actual_cell_size = int(self.cell_size * self.zoom_level)
+        actual_cell_size = max(self.min_cell_size, min(self.max_cell_size, actual_cell_size))
+        
+        grid_pixel_width = self.grid_width * actual_cell_size
+        grid_pixel_height = self.grid_height * actual_cell_size
+        
+        # Center horizontally and vertically, leaving space for UI
+        base_x = (screen_width - grid_pixel_width) // 2
+        base_y = (screen_height - grid_pixel_height) // 2 + 50  # +50 for title space
+        
+        # Apply scroll offset
+        self.grid_x = base_x + self.scroll_x
+        self.grid_y = base_y + self.scroll_y
+    
+    def _setup_new_level(self):
+        """Setup a new level with default configuration"""
         # Set borders as walls
         for i in range(self.grid_width):
             self.grid[0][i] = '1'
@@ -746,9 +1072,8 @@ class EditMapScene(Scene):
         self.grid[1][1] = 'S'
         self.grid[self.grid_height-2][self.grid_width-2] = 'G'
         
-        self.hovered_back = False
-        self.hovered_cell = None
-        self.dragging = False
+        # Center the grid on screen
+        self._center_grid()
     
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
@@ -760,6 +1085,18 @@ class EditMapScene(Scene):
                 self._save_level()
             elif e.key == pygame.K_l and pygame.key.get_pressed()[pygame.K_LCTRL]:
                 self._load_level()
+            elif e.key == pygame.K_PLUS or e.key == pygame.K_EQUALS:
+                self._zoom_in()
+            elif e.key == pygame.K_MINUS:
+                self._zoom_out()
+            elif e.key == pygame.K_0:
+                self._reset_zoom()
+        elif e.type == pygame.MOUSEWHEEL:
+            # Handle zoom with mouse wheel
+            if e.y > 0:  # Scroll up - zoom in
+                self._zoom_in()
+            elif e.y < 0:  # Scroll down - zoom out
+                self._zoom_out()
         elif e.type == pygame.MOUSEBUTTONDOWN:
             if e.button == 1:  # Left click
                 mouse_x, mouse_y = e.pos
@@ -771,12 +1108,20 @@ class EditMapScene(Scene):
                     self.game.scenes.switch(MenuScene(self.game))
                     return
                 
-                # Check grid click
-                self._handle_grid_click(mouse_x, mouse_y)
-                self.dragging = True
+                # Check if clicking on grid for editing
+                if self._is_grid_hover(mouse_x, mouse_y):
+                    self._handle_grid_click(mouse_x, mouse_y)
+                    self.dragging = True
+                else:
+                    # Start dragging for scroll
+                    self.dragging_scroll = True
+                    self.last_mouse_pos = (mouse_x, mouse_y)
+            elif e.button == 2:  # Middle click - reset zoom
+                self._reset_zoom()
         elif e.type == pygame.MOUSEBUTTONUP:
             if e.button == 1:  # Left click release
                 self.dragging = False
+                self.dragging_scroll = False
         elif e.type == pygame.MOUSEMOTION:
             mouse_x, mouse_y = e.pos
             sw, sh = self.game.screen.get_size()
@@ -785,16 +1130,26 @@ class EditMapScene(Scene):
             back_rect = pygame.Rect(30, 30, 80, 40)
             self.hovered_back = back_rect.collidepoint(mouse_x, mouse_y)
             
+            # Handle scroll dragging
+            if self.dragging_scroll:
+                dx = mouse_x - self.last_mouse_pos[0]
+                dy = mouse_y - self.last_mouse_pos[1]
+                self.scroll_x += dx
+                self.scroll_y += dy
+                self.last_mouse_pos = (mouse_x, mouse_y)
+            
             # Check grid hover
             self._handle_grid_hover(mouse_x, mouse_y)
             
-            # Handle dragging
+            # Handle dragging for editing
             if self.dragging:
                 self._handle_grid_click(mouse_x, mouse_y)
             
             # Set cursor
             if self.hovered_back or self._is_grid_hover(mouse_x, mouse_y):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            elif self.dragging_scroll:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZEALL)
             else:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
     
@@ -803,9 +1158,13 @@ class EditMapScene(Scene):
         if not self._is_grid_hover(mouse_x, mouse_y):
             return
         
+        # Calculate actual cell size based on zoom
+        actual_cell_size = int(self.cell_size * self.zoom_level)
+        actual_cell_size = max(self.min_cell_size, min(self.max_cell_size, actual_cell_size))
+        
         # Calculate grid position
-        grid_x = (mouse_x - self.grid_x) // self.cell_size
-        grid_y = (mouse_y - self.grid_y) // self.cell_size
+        grid_x = (mouse_x - self.grid_x) // actual_cell_size
+        grid_y = (mouse_y - self.grid_y) // actual_cell_size
         
         if 0 <= grid_x < self.grid_width and 0 <= grid_y < self.grid_height:
             self._place_tile(grid_x, grid_y)
@@ -813,8 +1172,12 @@ class EditMapScene(Scene):
     def _handle_grid_hover(self, mouse_x, mouse_y):
         """Handle hovering over the grid"""
         if self._is_grid_hover(mouse_x, mouse_y):
-            grid_x = (mouse_x - self.grid_x) // self.cell_size
-            grid_y = (mouse_y - self.grid_y) // self.cell_size
+            # Calculate actual cell size based on zoom
+            actual_cell_size = int(self.cell_size * self.zoom_level)
+            actual_cell_size = max(self.min_cell_size, min(self.max_cell_size, actual_cell_size))
+            
+            grid_x = (mouse_x - self.grid_x) // actual_cell_size
+            grid_y = (mouse_y - self.grid_y) // actual_cell_size
             if 0 <= grid_x < self.grid_width and 0 <= grid_y < self.grid_height:
                 self.hovered_cell = (grid_x, grid_y)
             else:
@@ -824,8 +1187,14 @@ class EditMapScene(Scene):
     
     def _is_grid_hover(self, mouse_x, mouse_y):
         """Check if mouse is over the grid"""
-        return (self.grid_x <= mouse_x < self.grid_x + self.grid_width * self.cell_size and
-                self.grid_y <= mouse_y < self.grid_y + self.grid_height * self.cell_size)
+        actual_cell_size = int(self.cell_size * self.zoom_level)
+        actual_cell_size = max(self.min_cell_size, min(self.max_cell_size, actual_cell_size))
+        
+        grid_pixel_width = self.grid_width * actual_cell_size
+        grid_pixel_height = self.grid_height * actual_cell_size
+        
+        return (self.grid_x <= mouse_x < self.grid_x + grid_pixel_width and
+                self.grid_y <= mouse_y < self.grid_y + grid_pixel_height)
     
     def _place_tile(self, grid_x, grid_y):
         """Place a tile at the given grid position"""
@@ -855,8 +1224,16 @@ class EditMapScene(Scene):
     def _save_level(self):
         """Save the current level"""
         try:
-            # Create a simple filename
-            filename = f"data/levels/level_edited.txt"
+            # Create filename based on level name
+            if self.level_name == "new_map":
+                # Generate a unique filename for new maps
+                import time
+                timestamp = int(time.time())
+                filename = f"data/levels/level_custom_{timestamp}.txt"
+            else:
+                # For existing levels, save to the original file
+                filename = f"data/levels/{self.level_name}.txt"
+            
             with open(filename, 'w') as f:
                 for row in self.grid:
                     f.write(''.join(row) + '\n')
@@ -870,18 +1247,54 @@ class EditMapScene(Scene):
             filename = f"data/levels/level01.txt"
             with open(filename, 'r') as f:
                 lines = f.readlines()
+                
+                # Get actual dimensions
+                actual_height = len(lines)
+                actual_width = len(lines[0].strip()) if lines else 0
+                
+                # Update grid dimensions
+                self.grid_width = actual_width
+                self.grid_height = actual_height
+                
+                # Recreate grid with correct dimensions
+                self.grid = [['0' for _ in range(self.grid_width)] for _ in range(self.grid_height)]
+                
+                # Load data
                 for y, line in enumerate(lines):
                     if y < self.grid_height:
                         for x, char in enumerate(line.strip()):
                             if x < self.grid_width:
                                 self.grid[y][x] = char
+                
+                # Center the grid
+                self._center_grid()
+                
             print(f"Level loaded from {filename}")
         except Exception as e:
             print(f"Error loading level: {e}")
     
+    def _zoom_in(self):
+        """Zoom in the grid"""
+        self.zoom_level = min(2.0, self.zoom_level * 1.2)
+    
+    def _zoom_out(self):
+        """Zoom out the grid"""
+        self.zoom_level = max(0.3, self.zoom_level / 1.2)
+    
+    def _reset_zoom(self):
+        """Reset zoom to fit the screen"""
+        # Calculate zoom level to fit the grid on screen
+        # This will be called in _update_grid_position
+        self.zoom_level = 1.0
+        self.scroll_x = 0
+        self.scroll_y = 0
+    
     def draw(self, screen):
         screen.fill(self.color_bg)
         sw, sh = screen.get_size()
+        
+        # Update grid position to center it
+        self._update_grid_position(sw, sh)
         
         # Back button
         back_rect = pygame.Rect(30, 30, 80, 40)
@@ -896,7 +1309,10 @@ class EditMapScene(Scene):
         screen.blit(back_text, back_text_rect)
         
         # Title
-        title_text = self.font_title.render("Edit Map", True, self.color_title)
+        if self.level_name == "new_map":
+            title_text = self.font_title.render("Create New Map", True, self.color_title)
+        else:
+            title_text = self.font_title.render(f"Edit {self.level_name}", True, self.color_title)
         title_rect = title_text.get_rect(center=(sw // 2, 50))
         screen.blit(title_text, title_rect)
         
@@ -927,8 +1343,9 @@ class EditMapScene(Scene):
         instructions = [
             "Click to place tiles",
             "1-5: Select tool",
-            "Ctrl+S: Save",
-            "Ctrl+L: Load"
+            "Ctrl+S: Save, Ctrl+L: Load",
+            "Mouse wheel: Zoom",
+            "Drag: Scroll, 0: Reset zoom"
         ]
         
         for i, instruction in enumerate(instructions):
@@ -940,30 +1357,34 @@ class EditMapScene(Scene):
     
     def _draw_grid(self, screen):
         """Draw the editing grid"""
+        # Calculate actual cell size based on zoom
+        actual_cell_size = int(self.cell_size * self.zoom_level)
+        actual_cell_size = max(self.min_cell_size, min(self.max_cell_size, actual_cell_size))
+        
         # Grid background
         grid_rect = pygame.Rect(self.grid_x, self.grid_y, 
-                               self.grid_width * self.cell_size, 
-                               self.grid_height * self.cell_size)
+                               self.grid_width * actual_cell_size, 
+                               self.grid_height * actual_cell_size)
         pygame.draw.rect(screen, self.color_grid_bg, grid_rect)
         pygame.draw.rect(screen, self.color_grid_border, grid_rect, 2)
         
         # Draw grid lines
         for x in range(self.grid_width + 1):
-            start_pos = (self.grid_x + x * self.cell_size, self.grid_y)
-            end_pos = (self.grid_x + x * self.cell_size, self.grid_y + self.grid_height * self.cell_size)
+            start_pos = (self.grid_x + x * actual_cell_size, self.grid_y)
+            end_pos = (self.grid_x + x * actual_cell_size, self.grid_y + self.grid_height * actual_cell_size)
             pygame.draw.line(screen, self.color_grid_border, start_pos, end_pos)
         
         for y in range(self.grid_height + 1):
-            start_pos = (self.grid_x, self.grid_y + y * self.cell_size)
-            end_pos = (self.grid_x + self.grid_width * self.cell_size, self.grid_y + y * self.cell_size)
+            start_pos = (self.grid_x, self.grid_y + y * actual_cell_size)
+            end_pos = (self.grid_x + self.grid_width * actual_cell_size, self.grid_y + y * actual_cell_size)
             pygame.draw.line(screen, self.color_grid_border, start_pos, end_pos)
         
         # Draw cells
         for y in range(self.grid_height):
             for x in range(self.grid_width):
-                cell_x = self.grid_x + x * self.cell_size
-                cell_y = self.grid_y + y * self.cell_size
-                cell_rect = pygame.Rect(cell_x + 1, cell_y + 1, self.cell_size - 2, self.cell_size - 2)
+                cell_x = self.grid_x + x * actual_cell_size
+                cell_y = self.grid_y + y * actual_cell_size
+                cell_rect = pygame.Rect(cell_x + 1, cell_y + 1, actual_cell_size - 2, actual_cell_size - 2)
                 
                 char = self.grid[y][x]
                 
@@ -981,7 +1402,7 @@ class EditMapScene(Scene):
         # Draw hovered cell
         if self.hovered_cell:
             hover_x, hover_y = self.hovered_cell
-            cell_x = self.grid_x + hover_x * self.cell_size
-            cell_y = self.grid_y + hover_y * self.cell_size
-            hover_rect = pygame.Rect(cell_x + 1, cell_y + 1, self.cell_size - 2, self.cell_size - 2)
+            cell_x = self.grid_x + hover_x * actual_cell_size
+            cell_y = self.grid_y + hover_y * actual_cell_size
+            hover_rect = pygame.Rect(cell_x + 1, cell_y + 1, actual_cell_size - 2, actual_cell_size - 2)
             pygame.draw.rect(screen, self.color_selected, hover_rect, 3)
