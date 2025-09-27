@@ -164,6 +164,193 @@
       "stars_total": 3,
       "steps": 60,
       "solver": "BFS"
+    },
+    {
+      "ts": 1758783328.9199934,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 40,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 332,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758784497.587155,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 38,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 332,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758785040.1633065,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 41,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 332,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758785676.3716602,
+      "level_name": "level01.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 7,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 60,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758785693.5744987,
+      "level_name": "level01.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 14,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 60,
+      "solver": "HUMAN"
+    },
+    {
+      "ts": 1758785734.2166593,
+      "level_name": "level05.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 20,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 154,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758785781.925326,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 39,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 332,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758788896.0799916,
+      "level_name": "level01.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 9,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 60,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758789100.5340867,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 122,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 332,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758789189.318298,
+      "level_name": "level05.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 22,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 154,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758789221.6510649,
+      "level_name": "level04.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 29,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 242,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758789436.1266901,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 29,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 236,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758938084.5222049,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 28,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 236,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758939567.4976447,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 30,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 236,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758940291.796943,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 29,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 236,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758941347.0306754,
+      "level_name": "level06.txt",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 28,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 236,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1758941356.8621252,
+      "level_name": "level_edited.txt",
+      "result": "WIN",
+      "score": 20,
+      "time_elapsed_sec": 7,
+      "stars_collected": 2,
+      "stars_total": 2,
+      "steps": 54,
+      "solver": "BFS"
     }
   ]
 }

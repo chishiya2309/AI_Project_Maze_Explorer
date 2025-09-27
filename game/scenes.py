@@ -12,7 +12,7 @@ class MenuScene(Scene):
         self.font_button = pygame.font.SysFont("segoeui", 28, bold=True)
         self.font_small = pygame.font.SysFont("segoeui", 20)
         self.font_tiny = pygame.font.SysFont("segoeui", 16)
-        self.selected_button = 0  # 0=Start, 1=History, 2=Quit
+        self.selected_button = 0  # 0=Start, 1=History, 2=Edit Map, 3=Quit
         
         self.color_bg = (20, 30, 40)  # Nền màu tối
         self.color_title_white = (255, 255, 255)
@@ -25,9 +25,9 @@ class MenuScene(Scene):
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
             if e.key == pygame.K_UP:
-                self.selected_button = (self.selected_button - 1) % 3
+                self.selected_button = (self.selected_button - 1) % 4
             elif e.key == pygame.K_DOWN:
-                self.selected_button = (self.selected_button + 1) % 3
+                self.selected_button = (self.selected_button + 1) % 4
             elif e.key in (pygame.K_RETURN, pygame.K_SPACE):
                 self._activate_button()
         elif e.type == pygame.MOUSEBUTTONDOWN:
@@ -43,7 +43,7 @@ class MenuScene(Scene):
             
             # Kiểm tra xem con trỏ chuột có nằm trên bất kỳ nút nào không
             mouse_over_button = False
-            for i in range(3):
+            for i in range(4):
                 button_rect = pygame.Rect((sw - 200) // 2, button_y + i * button_spacing, 200, button_height)
                 if button_rect.collidepoint(mouse_x, mouse_y):
                     self.selected_button = i
@@ -62,7 +62,9 @@ class MenuScene(Scene):
             self.game.scenes.switch(LevelSelectScene(self.game))
         elif self.selected_button == 1:  # History
             self.game.scenes.switch(HistoryScene(self.game))
-        elif self.selected_button == 2:  # Quit
+        elif self.selected_button == 2:  # Edit Map
+            self.game.scenes.switch(EditMapScene(self.game))
+        elif self.selected_button == 3:  # Quit
             self.game.running = False
     
     def draw(self, screen):
@@ -89,7 +91,7 @@ class MenuScene(Scene):
         button_width = 200
         button_height = 50
         
-        buttons = ["Start", "History", "Quit"]
+        buttons = ["Start", "History", "Edit Map", "Quit"]
         for i, button_text in enumerate(buttons):
             # Nền nút
             if i == self.selected_button:
@@ -690,3 +692,296 @@ class LevelSelectScene(Scene):
             level_surface = self.font_level.render(level_text, True, self.color_card_text)
             level_rect = level_surface.get_rect(center=(card_x + self.card_width // 2, card_y + self.card_height // 2))
             screen.blit(level_surface, level_rect)
+
+class EditMapScene(Scene):
+    def __init__(self, game):
+        super().__init__(game)
+        self.font_title = pygame.font.SysFont("segoeui", 48, bold=True)
+        self.font_button = pygame.font.SysFont("segoeui", 24, bold=True)
+        self.font_small = pygame.font.SysFont("segoeui", 18)
+        self.font_tiny = pygame.font.SysFont("segoeui", 14)
+        
+        # Colors
+        self.color_bg = (20, 30, 40)  # Dark background
+        self.color_title = (255, 255, 255)  # White title
+        self.color_back_button = (100, 150, 255)  # Blue back button
+        self.color_back_button_hover = (120, 170, 255)  # Lighter blue for hover
+        self.color_back_button_text = (255, 255, 255)  # White text
+        
+        # Grid colors
+        self.color_grid_bg = (40, 50, 70)  # Dark blue grid background
+        self.color_grid_border = (80, 100, 120)  # Grid border
+        self.color_wall = (60, 60, 60)  # Wall color
+        self.color_floor = (100, 100, 100)  # Floor color
+        self.color_start = (100, 255, 100)  # Start position (green)
+        self.color_goal = (255, 100, 100)  # Goal position (red)
+        self.color_star = (255, 255, 100)  # Star color (yellow)
+        self.color_selected = (255, 200, 100)  # Selected cell (orange)
+        
+        # Grid settings
+        self.grid_size = 20
+        self.grid_width = 15
+        self.grid_height = 15
+        self.cell_size = 25
+        self.grid_x = 50
+        self.grid_y = 100
+        
+        # Editor state
+        self.selected_tool = 0  # 0=Wall, 1=Floor, 2=Start, 3=Goal, 4=Star
+        self.tools = ["Wall", "Floor", "Start", "Goal", "Star"]
+        self.tool_colors = [self.color_wall, self.color_floor, self.color_start, self.color_goal, self.color_star]
+        
+        # Grid data (0=floor, 1=wall, S=start, G=goal, *=star)
+        self.grid = [['0' for _ in range(self.grid_width)] for _ in range(self.grid_height)]
+        
+        # Set borders as walls
+        for i in range(self.grid_width):
+            self.grid[0][i] = '1'
+            self.grid[self.grid_height-1][i] = '1'
+        for i in range(self.grid_height):
+            self.grid[i][0] = '1'
+            self.grid[i][self.grid_width-1] = '1'
+        
+        # Set default start and goal
+        self.grid[1][1] = 'S'
+        self.grid[self.grid_height-2][self.grid_width-2] = 'G'
+        
+        self.hovered_back = False
+        self.hovered_cell = None
+        self.dragging = False
+    
+    def handle_event(self, e):
+        if e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_ESCAPE:
+                self.game.scenes.switch(MenuScene(self.game))
+            elif e.key in (pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5):
+                self.selected_tool = e.key - pygame.K_1
+            elif e.key == pygame.K_s and pygame.key.get_pressed()[pygame.K_LCTRL]:
+                self._save_level()
+            elif e.key == pygame.K_l and pygame.key.get_pressed()[pygame.K_LCTRL]:
+                self._load_level()
+        elif e.type == pygame.MOUSEBUTTONDOWN:
+            if e.button == 1:  # Left click
+                mouse_x, mouse_y = e.pos
+                sw, sh = self.game.screen.get_size()
+                
+                # Check back button
+                back_rect = pygame.Rect(30, 30, 80, 40)
+                if back_rect.collidepoint(mouse_x, mouse_y):
+                    self.game.scenes.switch(MenuScene(self.game))
+                    return
+                
+                # Check grid click
+                self._handle_grid_click(mouse_x, mouse_y)
+                self.dragging = True
+        elif e.type == pygame.MOUSEBUTTONUP:
+            if e.button == 1:  # Left click release
+                self.dragging = False
+        elif e.type == pygame.MOUSEMOTION:
+            mouse_x, mouse_y = e.pos
+            sw, sh = self.game.screen.get_size()
+            
+            # Check if hovering over back button
+            back_rect = pygame.Rect(30, 30, 80, 40)
+            self.hovered_back = back_rect.collidepoint(mouse_x, mouse_y)
+            
+            # Check grid hover
+            self._handle_grid_hover(mouse_x, mouse_y)
+            
+            # Handle dragging
+            if self.dragging:
+                self._handle_grid_click(mouse_x, mouse_y)
+            
+            # Set cursor
+            if self.hovered_back or self._is_grid_hover(mouse_x, mouse_y):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+    
+    def _handle_grid_click(self, mouse_x, mouse_y):
+        """Handle clicking on the grid"""
+        if not self._is_grid_hover(mouse_x, mouse_y):
+            return
+        
+        # Calculate grid position
+        grid_x = (mouse_x - self.grid_x) // self.cell_size
+        grid_y = (mouse_y - self.grid_y) // self.cell_size
+        
+        if 0 <= grid_x < self.grid_width and 0 <= grid_y < self.grid_height:
+            self._place_tile(grid_x, grid_y)
+    
+    def _handle_grid_hover(self, mouse_x, mouse_y):
+        """Handle hovering over the grid"""
+        if self._is_grid_hover(mouse_x, mouse_y):
+            grid_x = (mouse_x - self.grid_x) // self.cell_size
+            grid_y = (mouse_y - self.grid_y) // self.cell_size
+            if 0 <= grid_x < self.grid_width and 0 <= grid_y < self.grid_height:
+                self.hovered_cell = (grid_x, grid_y)
+            else:
+                self.hovered_cell = None
+        else:
+            self.hovered_cell = None
+    
+    def _is_grid_hover(self, mouse_x, mouse_y):
+        """Check if mouse is over the grid"""
+        return (self.grid_x <= mouse_x < self.grid_x + self.grid_width * self.cell_size and
+                self.grid_y <= mouse_y < self.grid_y + self.grid_height * self.cell_size)
+    
+    def _place_tile(self, grid_x, grid_y):
+        """Place a tile at the given grid position"""
+        tool = self.selected_tool
+        
+        if tool == 0:  # Wall
+            self.grid[grid_y][grid_x] = '1'
+        elif tool == 1:  # Floor
+            self.grid[grid_y][grid_x] = '0'
+        elif tool == 2:  # Start
+            # Remove existing start
+            for y in range(self.grid_height):
+                for x in range(self.grid_width):
+                    if self.grid[y][x] == 'S':
+                        self.grid[y][x] = '0'
+            self.grid[grid_y][grid_x] = 'S'
+        elif tool == 3:  # Goal
+            # Remove existing goal
+            for y in range(self.grid_height):
+                for x in range(self.grid_width):
+                    if self.grid[y][x] == 'G':
+                        self.grid[y][x] = '0'
+            self.grid[grid_y][grid_x] = 'G'
+        elif tool == 4:  # Star
+            self.grid[grid_y][grid_x] = '*'
+    
+    def _save_level(self):
+        """Save the current level"""
+        try:
+            # Create a simple filename
+            filename = f"data/levels/level_edited.txt"
+            with open(filename, 'w') as f:
+                for row in self.grid:
+                    f.write(''.join(row) + '\n')
+            print(f"Level saved to {filename}")
+        except Exception as e:
+            print(f"Error saving level: {e}")
+    
+    def _load_level(self):
+        """Load a level file"""
+        try:
+            filename = f"data/levels/level01.txt"
+            with open(filename, 'r') as f:
+                lines = f.readlines()
+                for y, line in enumerate(lines):
+                    if y < self.grid_height:
+                        for x, char in enumerate(line.strip()):
+                            if x < self.grid_width:
+                                self.grid[y][x] = char
+            print(f"Level loaded from {filename}")
+        except Exception as e:
+            print(f"Error loading level: {e}")
+    
+    def draw(self, screen):
+        screen.fill(self.color_bg)
+        sw, sh = screen.get_size()
+        
+        # Back button
+        back_rect = pygame.Rect(30, 30, 80, 40)
+        back_color = self.color_back_button_hover if self.hovered_back else self.color_back_button
+        pygame.draw.rect(screen, back_color, back_rect, border_radius=8)
+        
+        if self.hovered_back:
+            pygame.draw.rect(screen, (150, 200, 255), back_rect, 2, border_radius=8)
+        
+        back_text = self.font_button.render("Back", True, self.color_back_button_text)
+        back_text_rect = back_text.get_rect(center=back_rect.center)
+        screen.blit(back_text, back_text_rect)
+        
+        # Title
+        title_text = self.font_title.render("Edit Map", True, self.color_title)
+        title_rect = title_text.get_rect(center=(sw // 2, 50))
+        screen.blit(title_text, title_rect)
+        
+        # Tool selection
+        tool_y = 80
+        tool_width = 80
+        tool_height = 30
+        tool_spacing = 10
+        
+        for i, tool in enumerate(self.tools):
+            tool_x = 200 + i * (tool_width + tool_spacing)
+            tool_rect = pygame.Rect(tool_x, tool_y, tool_width, tool_height)
+            
+            # Tool background
+            if i == self.selected_tool:
+                pygame.draw.rect(screen, self.tool_colors[i], tool_rect, border_radius=5)
+                pygame.draw.rect(screen, (255, 255, 255), tool_rect, 2, border_radius=5)
+            else:
+                pygame.draw.rect(screen, self.color_grid_bg, tool_rect, border_radius=5)
+                pygame.draw.rect(screen, self.tool_colors[i], tool_rect, 2, border_radius=5)
+            
+            # Tool text
+            tool_text = self.font_small.render(tool, True, (255, 255, 255))
+            tool_text_rect = tool_text.get_rect(center=tool_rect.center)
+            screen.blit(tool_text, tool_text_rect)
+        
+        # Instructions
+        instructions = [
+            "Click to place tiles",
+            "1-5: Select tool",
+            "Ctrl+S: Save",
+            "Ctrl+L: Load"
+        ]
+        
+        for i, instruction in enumerate(instructions):
+            inst_text = self.font_tiny.render(instruction, True, (200, 200, 200))
+            screen.blit(inst_text, (sw - 200, 80 + i * 20))
+        
+        # Draw grid
+        self._draw_grid(screen)
+    
+    def _draw_grid(self, screen):
+        """Draw the editing grid"""
+        # Grid background
+        grid_rect = pygame.Rect(self.grid_x, self.grid_y, 
+                               self.grid_width * self.cell_size, 
+                               self.grid_height * self.cell_size)
+        pygame.draw.rect(screen, self.color_grid_bg, grid_rect)
+        pygame.draw.rect(screen, self.color_grid_border, grid_rect, 2)
+        
+        # Draw grid lines
+        for x in range(self.grid_width + 1):
+            start_pos = (self.grid_x + x * self.cell_size, self.grid_y)
+            end_pos = (self.grid_x + x * self.cell_size, self.grid_y + self.grid_height * self.cell_size)
+            pygame.draw.line(screen, self.color_grid_border, start_pos, end_pos)
+        
+        for y in range(self.grid_height + 1):
+            start_pos = (self.grid_x, self.grid_y + y * self.cell_size)
+            end_pos = (self.grid_x + self.grid_width * self.cell_size, self.grid_y + y * self.cell_size)
+            pygame.draw.line(screen, self.color_grid_border, start_pos, end_pos)
+        
+        # Draw cells
+        for y in range(self.grid_height):
+            for x in range(self.grid_width):
+                cell_x = self.grid_x + x * self.cell_size
+                cell_y = self.grid_y + y * self.cell_size
+                cell_rect = pygame.Rect(cell_x + 1, cell_y + 1, self.cell_size - 2, self.cell_size - 2)
+                
+                char = self.grid[y][x]
+                
+                if char == '1':  # Wall
+                    pygame.draw.rect(screen, self.color_wall, cell_rect)
+                elif char == 'S':  # Start
+                    pygame.draw.rect(screen, self.color_start, cell_rect)
+                elif char == 'G':  # Goal
+                    pygame.draw.rect(screen, self.color_goal, cell_rect)
+                elif char == '*':  # Star
+                    pygame.draw.rect(screen, self.color_star, cell_rect)
+                else:  # Floor
+                    pygame.draw.rect(screen, self.color_floor, cell_rect)
+        
+        # Draw hovered cell
+        if self.hovered_cell:
+            hover_x, hover_y = self.hovered_cell
+            cell_x = self.grid_x + hover_x * self.cell_size
+            cell_y = self.grid_y + hover_y * self.cell_size
+            hover_rect = pygame.Rect(cell_x + 1, cell_y + 1, self.cell_size - 2, self.cell_size - 2)
+            pygame.draw.rect(screen, self.color_selected, hover_rect, 3)
