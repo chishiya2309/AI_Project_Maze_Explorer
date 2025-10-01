@@ -126,7 +126,12 @@ class LevelScene(Scene):
         if self.cool <= 0:
             dx = dy = 0
             # Nếu AI đang hoạt động thì lấy bước kế tiếp từ AI
-            step = self.ai.get_next_step()
+            # Nếu đang trình diễn quá trình tìm kiếm, tick và không di chuyển
+            if getattr(self.ai, 'showing_trace', False):
+                self.ai.tick_trace()
+                step = None
+            else:
+                step = self.ai.get_next_step()
             if step is not None:
                 dx, dy = step
             else:
@@ -234,6 +239,66 @@ class LevelScene(Scene):
         # Vẽ tường kiểu mỏng
         self._draw_thin_walls(screen)
         
+        # Vẽ overlay trực quan hóa BFS nếu đang hiển thị
+        if getattr(self.ai, 'showing_trace', False):
+            visited, cur = self.ai.get_trace_progress()
+            # Các ô đã mở rộng: xanh lam nhạt
+            for (vx, vy) in visited:
+                if self.grid.get_cell(vx, vy) == '1':
+                    continue
+                rect = pygame.Rect(
+                    self.offset_x + vx * self.tile,
+                    self.offset_y + vy * self.tile,
+                    self.tile, self.tile
+                )
+                s = pygame.Surface((self.tile, self.tile), pygame.SRCALPHA)
+                s.fill((80, 150, 255, 70))  # alpha nhẹ
+                screen.blit(s, rect.topleft)
+            # Ô hiện tại: xanh lam đậm
+            if cur is not None:
+                cx, cy = cur
+                if self.grid.get_cell(cx, cy) != '1':
+                    rect = pygame.Rect(
+                        self.offset_x + cx * self.tile,
+                        self.offset_y + cy * self.tile,
+                        self.tile, self.tile
+                    )
+                    s = pygame.Surface((self.tile, self.tile), pygame.SRCALPHA)
+                    s.fill((30, 200, 255, 120))
+                    screen.blit(s, rect.topleft)
+
+        # Vẽ overlay quá trình thực thi lời giải (sau khi trace xong và đang phát moves)
+        if self.ai.active and not getattr(self.ai, 'showing_trace', False):
+            visited_nodes, remaining_nodes = self.ai.get_solution_progress()
+            # visited: xanh lá nhạt
+            if visited_nodes:
+                s_visited = pygame.Surface((self.tile, self.tile), pygame.SRCALPHA)
+                s_visited.fill((60, 220, 120, 90))
+                for (vx, vy) in visited_nodes:
+                    if self.grid.get_cell(vx, vy) == '1':
+                        continue
+                    screen.blit(
+                        s_visited,
+                        (
+                            self.offset_x + vx * self.tile,
+                            self.offset_y + vy * self.tile,
+                        ),
+                    )
+            # remaining: vàng nhạt
+            if remaining_nodes:
+                s_remain = pygame.Surface((self.tile, self.tile), pygame.SRCALPHA)
+                s_remain.fill((255, 220, 80, 70))
+                for (rx, ry) in remaining_nodes:
+                    if self.grid.get_cell(rx, ry) == '1':
+                        continue
+                    screen.blit(
+                        s_remain,
+                        (
+                            self.offset_x + rx * self.tile,
+                            self.offset_y + ry * self.tile,
+                        ),
+                    )
+
         # Vẽ ngôi sao bằng ảnh
         for (x, y) in self.star_collector.get_remaining_stars():
             cx = self.offset_x + x * self.tile + self.tile // 2

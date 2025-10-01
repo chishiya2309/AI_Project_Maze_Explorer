@@ -1,5 +1,3 @@
-# maze_explorer/core/scene.py
-
 # ================== SCENE SYSTEM ==================
 class Scene:
     def __init__(self, game): 
