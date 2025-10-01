@@ -49,6 +49,10 @@ class HUD:
         star_surface = self.font.render(star_text, True, (255, 255, 0))
         star_rect = star_surface.get_rect(topright=(sw - 20, 45))
         screen.blit(star_surface, star_rect)
+        # Steps (under star count)
+        steps_text = self.small_font.render(f"Steps: {steps}", True, (220, 230, 240))
+        steps_rect = steps_text.get_rect(topright=(sw - 20, 200))
+        screen.blit(steps_text, steps_rect)
     
     def draw_result(self, screen, result: str):
         """Vẽ kết quả game (WIN/LOSE)"""
