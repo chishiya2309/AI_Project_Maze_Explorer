@@ -1,4 +1,3 @@
-# maze_explorer/core/engine.py
 import pygame
 import time
 from typing import List
@@ -76,7 +75,7 @@ class GameApp:
         self.clock = pygame.time.Clock()
         self.running = True
         self.stats = StatsStore(STATS_FILE)
-        # Scene manager will be injected from main
+        # Scene manager sẽ được truyền vào từ main
         self.scenes = None
 
     def set_scene_manager(self, scene_manager):

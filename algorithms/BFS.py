@@ -228,3 +228,83 @@ def bfs_collect_at_least_k_stars(rows: List[str], k: int = 3) -> Dict[str, objec
     }
 
 
+def bfs_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
+    """Giống bfs_collect_all_stars nhưng trả thêm quá trình duyệt để trực quan hóa.
+
+    Trả về thêm:
+      - "expanded_order": List[(x, y)] theo thứ tự lấy ra từ hàng đợi (đã mở rộng)
+    """
+    start, goal, stars, width, height = _parse_level(rows)
+
+    star_index: Dict[Position, int] = {pos: i for i, pos in enumerate(stars)}
+    all_mask = (1 << len(stars)) - 1
+
+    start_mask = 0
+
+    queue: Deque[State] = deque()
+    parents: Dict[State, Tuple[Optional[State], str]] = {}
+    visited: Set[State] = set()
+
+    expanded_order: List[Position] = []
+
+    start_state: State = (start[0], start[1], start_mask)
+    queue.append(start_state)
+    parents[start_state] = (None, "")
+    visited.add(start_state)
+
+    directions: List[Tuple[int, int, str]] = [
+        (0, -1, "U"),
+        (0, 1, "D"),
+        (-1, 0, "L"),
+        (1, 0, "R"),
+    ]
+
+    end_state: Optional[State] = None
+
+    while queue:
+        x, y, mask = queue.popleft()
+        expanded_order.append((x, y))
+
+        if (x, y) == goal and mask == all_mask:
+            end_state = (x, y, mask)
+            break
+
+        for dx, dy, move in directions:
+            nx, ny = x + dx, y + dy
+            if _is_blocked(rows, nx, ny, width, height):
+                continue
+
+            next_mask = mask
+            pos = (nx, ny)
+            if pos in star_index:
+                next_mask = mask | (1 << star_index[pos])
+
+            nxt: State = (nx, ny, next_mask)
+            if nxt in visited:
+                continue
+            visited.add(nxt)
+            parents[nxt] = ((x, y, mask), move)
+            queue.append(nxt)
+
+    if end_state is None:
+        return {
+            "path": [],
+            "moves": [],
+            "steps": 0,
+            "stars_total": len(stars),
+            "found": False,
+            "expanded_order": expanded_order,
+        }
+
+    path, moves = _reconstruct_path(parents, end_state)
+
+    return {
+        "path": path,
+        "moves": moves,
+        "steps": len(moves),
+        "stars_total": len(stars),
+        "found": True,
+        "expanded_order": expanded_order,
+    }
+
+

@@ -461,6 +461,94 @@
       "stars_total": 3,
       "steps": 474,
       "solver": "BFS"
+    },
+    {
+      "ts": 1759322743.8988118,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 13,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 60,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759322954.9781249,
+      "level_name": "Level 2",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 27,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 120,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759322995.703949,
+      "level_name": "Level 3",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 38,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 156,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759323044.98535,
+      "level_name": "Level 4",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 46,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 242,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759323102.7776394,
+      "level_name": "Level 7",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 46,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 256,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759323195.212537,
+      "level_name": "Level 6",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 66,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 236,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759323384.565082,
+      "level_name": "Level 7",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 45,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 256,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759323493.5338736,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 107,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 474,
+      "solver": "BFS"
     }
   ]
 }
