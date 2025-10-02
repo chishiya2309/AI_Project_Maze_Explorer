@@ -135,7 +135,7 @@ def greedy_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
                 continue
 
             # Heuristic: khoảng cách Manhattan đến G + số sao chưa thu thập
-            stars_left = len(stars) - next_mask.bit_count()
+            stars_left = len(stars) - bin(next_mask).count('1')
             h_score = _manhattan_distance((nx, ny), goal) + stars_left
 
             heappush(queue, (h_score, nxt))

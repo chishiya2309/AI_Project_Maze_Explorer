@@ -187,7 +187,7 @@ def bfs_collect_at_least_k_stars(rows: List[str], k: int = 3) -> Dict[str, objec
         x, y, mask = queue.popleft()
 
         # Kiểm tra số sao đã thu
-        collected = mask.bit_count()
+        collected = bin(mask).count('1')
         if (x, y) == goal and collected >= need:
             end_state = (x, y, mask)
             break
