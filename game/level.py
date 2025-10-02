@@ -13,6 +13,7 @@ from game.grid import Grid
 from game.collectibles import StarCollector
 from game.hud import HUD
 from core.assets import load_image
+import random
 from game.ai_control import AIController
 
 class LevelScene(Scene):
@@ -43,7 +44,15 @@ class LevelScene(Scene):
         self.img_star_base = load_image("star.png")
         self.img_door_closed_base = load_image("closed_door.png")
         self.img_door_open_base = load_image("open_door.png")
-        self.img_wall_base = load_image("tuong1.png")
+        # Load all wall variants
+        self.img_wall_bases = [
+            load_image("tuong1.png"),
+            load_image("tuong2.png"),
+            load_image("tuong3.png"),
+            load_image("tuong4.png"),
+        ]
+        # Build a deterministic random index map per wall cell so textures stay stable while playing
+        self._build_wall_variant_map()
 
         # View/scale state for responsive rendering
         self.scale = 1.0
@@ -89,8 +98,11 @@ class LevelScene(Scene):
         star_size = max(2, self.tile // 2)
         self.img_star = pygame.transform.smoothscale(self.img_star_base, (star_size, star_size))
         self.star_half = star_size // 2
-        # Wall fills the entire tile
-        self.img_wall = pygame.transform.smoothscale(self.img_wall_base, (self.tile, self.tile))
+        # Wall fills the entire tile - scale variants
+        self.img_walls = [
+            pygame.transform.smoothscale(img, (self.tile, self.tile))
+            for img in self.img_wall_bases
+        ]
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
@@ -195,8 +207,22 @@ class LevelScene(Scene):
                 if self.grid.get_cell(x, y) == "1":  # Nếu là tường
                     cell_x = self.offset_x + x * self.tile
                     cell_y = self.offset_y + y * self.tile
-                    # Vẽ hình ảnh tường cho toàn bộ ô
-                    screen.blit(self.img_wall, (cell_x, cell_y))
+                    # Lấy chỉ số texture đã gán sẵn cho ô tường này
+                    idx = self.wall_variant_idx[y][x]
+                    img = self.img_walls[idx]
+                    screen.blit(img, (cell_x, cell_y))
+
+    def _build_wall_variant_map(self):
+        """Gán ngẫu nhiên 1 trong 4 texture tường cho mỗi ô tường.
+        Dùng công thức băm theo (x,y) để kết quả ổn định trong suốt ván chơi.
+        """
+        self.wall_variant_idx = [[0 for _ in range(self.grid.W)] for _ in range(self.grid.H)]
+        for y in range(self.grid.H):
+            for x in range(self.grid.W):
+                if self.grid.get_cell(x, y) == "1":
+                    # Hash-based deterministic pseudo-random in range [0, 3]
+                    h = (x * 73856093) ^ (y * 19349663)
+                    self.wall_variant_idx[y][x] = h % 4
 
     def draw(self, screen):
         screen.fill(COLOR_BG)
