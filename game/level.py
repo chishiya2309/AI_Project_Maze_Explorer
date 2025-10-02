@@ -13,6 +13,7 @@ from game.grid import Grid
 from game.collectibles import StarCollector
 from game.hud import HUD
 from core.assets import load_image
+import random
 from game.ai_control import AIController
 
 class LevelScene(Scene):
@@ -43,6 +44,17 @@ class LevelScene(Scene):
         self.img_star_base = load_image("star.png")
         self.img_door_closed_base = load_image("closed_door.png")
         self.img_door_open_base = load_image("open_door.png")
+        # Background image for play area (below header)
+        self.img_bg_base = load_image("background.png")
+        # Load all wall variants
+        self.img_wall_bases = [
+            load_image("tuong1.png"),
+            load_image("tuong2.png"),
+            load_image("tuong3.png"),
+            load_image("tuong4.png"),
+        ]
+        # Build a deterministic random index map per wall cell so textures stay stable while playing
+        self._build_wall_variant_map()
 
         # View/scale state for responsive rendering
         self.scale = 1.0
@@ -74,6 +86,12 @@ class LevelScene(Scene):
         grid_px_h = self.grid.H * self.tile
         self.offset_x = (screen_w - grid_px_w) // 2
         self.offset_y = header_height + (avail_h - grid_px_h) // 2
+        # Rescale background for the playable area under the header
+        try:
+            bg_height = max(1, screen_h - header_height)
+            self.img_bg = pygame.transform.smoothscale(self.img_bg_base, (screen_w, bg_height))
+        except Exception:
+            self.img_bg = None
         self._rescale_sprites()
 
     def _rescale_sprites(self):
@@ -88,6 +106,11 @@ class LevelScene(Scene):
         star_size = max(2, self.tile // 2)
         self.img_star = pygame.transform.smoothscale(self.img_star_base, (star_size, star_size))
         self.star_half = star_size // 2
+        # Wall fills the entire tile - scale variants
+        self.img_walls = [
+            pygame.transform.smoothscale(img, (self.tile, self.tile))
+            for img in self.img_wall_bases
+        ]
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
@@ -185,48 +208,35 @@ class LevelScene(Scene):
         )
         self.game.stats.add(rec)
 
-    def _draw_thin_walls(self, screen):
-        """Vẽ tường kiểu mỏng theo đường viền"""
-        wall_thickness = max(1, self.tile // 16)  # Tường mỏng hơn
-        
+    def _draw_walls(self, screen):
+        """Vẽ tường bằng hình ảnh tuong.png"""
         for y in range(self.grid.H):
             for x in range(self.grid.W):
                 if self.grid.get_cell(x, y) == "1":  # Nếu là tường
                     cell_x = self.offset_x + x * self.tile
                     cell_y = self.offset_y + y * self.tile
-                    
-                    # Kiểm tra các ô xung quanh
-                    top_wall = self.grid.get_cell(x, y-1) == "1"
-                    bottom_wall = self.grid.get_cell(x, y+1) == "1"
-                    left_wall = self.grid.get_cell(x-1, y) == "1"
-                    right_wall = self.grid.get_cell(x+1, y) == "1"
-                    
-                    # Vẽ viền trên
-                    if not top_wall:
-                        pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x, cell_y, self.tile, wall_thickness
-                        ))
-                    
-                    # Vẽ viền dưới
-                    if not bottom_wall:
-                        pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x, cell_y + self.tile - wall_thickness, self.tile, wall_thickness
-                        ))
-                    
-                    # Vẽ viền trái
-                    if not left_wall:
-                        pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x, cell_y, wall_thickness, self.tile
-                        ))
-                    
-                    # Vẽ viền phải
-                    if not right_wall:
-                        pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x + self.tile - wall_thickness, cell_y, wall_thickness, self.tile
-                        ))
+                    # Lấy chỉ số texture đã gán sẵn cho ô tường này
+                    idx = self.wall_variant_idx[y][x]
+                    img = self.img_walls[idx]
+                    screen.blit(img, (cell_x, cell_y))
+
+    def _build_wall_variant_map(self):
+        """Gán ngẫu nhiên 1 trong 4 texture tường cho mỗi ô tường.
+        Dùng công thức băm theo (x,y) để kết quả ổn định trong suốt ván chơi.
+        """
+        self.wall_variant_idx = [[0 for _ in range(self.grid.W)] for _ in range(self.grid.H)]
+        for y in range(self.grid.H):
+            for x in range(self.grid.W):
+                if self.grid.get_cell(x, y) == "1":
+                    # Hash-based deterministic pseudo-random in range [0, 3]
+                    h = (x * 73856093) ^ (y * 19349663)
+                    self.wall_variant_idx[y][x] = h % 4
 
     def draw(self, screen):
         screen.fill(COLOR_BG)
+        # Draw background image under the 80px header so gameplay elements appear on top
+        if getattr(self, 'img_bg', None):
+            screen.blit(self.img_bg, (0, 80))
         
         # Vẽ nền cho tất cả các ô (đường đi)
         for y in range(self.grid.H):
@@ -238,8 +248,8 @@ class LevelScene(Scene):
                         self.tile, self.tile
                     ))
         
-        # Vẽ tường kiểu mỏng
-        self._draw_thin_walls(screen)
+        # Vẽ tường bằng hình ảnh
+        self._draw_walls(screen)
         
         # Vẽ overlay trực quan hóa BFS nếu đang hiển thị
         if getattr(self.ai, 'showing_trace', False):
