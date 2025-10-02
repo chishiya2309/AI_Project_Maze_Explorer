@@ -1,5 +1,6 @@
 import pygame
 from core.scene import Scene
+from core.assets import load_image
 
 
 class MenuScene(Scene):
@@ -18,6 +19,9 @@ class MenuScene(Scene):
         self.color_button_text = (100, 255, 100)  # Màu xanh lá cây sáng
         self.color_text = (200, 200, 200)
         self.color_group = (150, 150, 150)
+
+        # Background image for main menu
+        self.bg_image = load_image("menu_background.png")
     
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
@@ -68,8 +72,13 @@ class MenuScene(Scene):
             self.game.running = False
     
     def draw(self, screen):
-        screen.fill(self.color_bg)
         sw, sh = screen.get_size()
+        # Draw background image first, scaled to screen size
+        if self.bg_image:
+            bg_scaled = pygame.transform.smoothscale(self.bg_image, (sw, sh))
+            screen.blit(bg_scaled, (0, 0))
+        else:
+            screen.fill(self.color_bg)
         
         # Vẽ tiêu đề "MazeExplorer" với các màu khác nhau
         title1 = self.font_title.render("Maze", True, self.color_title_white)
