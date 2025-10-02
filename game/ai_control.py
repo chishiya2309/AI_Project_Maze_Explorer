@@ -1,11 +1,14 @@
 import pygame
 from typing import List, Optional, Tuple
-from algorithms.BFS import bfs_collect_all_stars, bfs_collect_all_stars_with_trace
-
+from algorithms.BFS import bfs_collect_all_stars_with_trace
+from algorithms.AStar import astar_collect_all_stars_with_trace
+from algorithms.Greedy import greedy_collect_all_stars_with_trace
+from algorithms.DFS import dfs_collect_all_stars_with_trace
+from algorithms.UCS import ucs_collect_all_stars_with_trace
 
 class AIController:
     def __init__(self):
-        self.active: Optional[str] = None  # "BFS" | others in tương lai
+        self.active: Optional[str] = None  # "BFS" | "AStar" | "Greedy" | "DFS" | "UCS" | others in tương lai
         self.moves: List[str] = []
         self.move_index: int = 0
         # Tracing
@@ -55,24 +58,85 @@ class AIController:
         if not res.get("found"):
             self.reset()
             return
-        # moves là danh sách 'U','D','L','R'
         self.moves = res.get("moves", [])
         self.move_index = 0
-        # Tracing
         self.trace_positions = res.get("expanded_order", [])
         self.trace_index = 0
         self.showing_trace = True
-        # Lưu path để hiển thị quá trình thực thi lời giải
+        self.solution_path = res.get("path", [])
+
+    def _compute_astar(self, level_scene):
+        rows = self._build_rows_from_scene(level_scene)
+        res = astar_collect_all_stars_with_trace(rows)
+        if not res.get("found"):
+            self.reset()
+            return
+        self.moves = res.get("moves", [])
+        self.move_index = 0
+        self.trace_positions = res.get("expanded_order", [])
+        self.trace_index = 0
+        self.showing_trace = True
+        self.solution_path = res.get("path", [])
+
+    def _compute_greedy(self, level_scene):
+        rows = self._build_rows_from_scene(level_scene)
+        res = greedy_collect_all_stars_with_trace(rows)
+        if not res.get("found"):
+            self.reset()
+            return
+        self.moves = res.get("moves", [])
+        self.move_index = 0
+        self.trace_positions = res.get("expanded_order", [])
+        self.trace_index = 0
+        self.showing_trace = True
+        self.solution_path = res.get("path", [])
+
+    def _compute_dfs(self, level_scene):
+        rows = self._build_rows_from_scene(level_scene)
+        res = dfs_collect_all_stars_with_trace(rows)
+        if not res.get("found"):
+            self.reset()
+            return
+        self.moves = res.get("moves", [])
+        self.move_index = 0
+        self.trace_positions = res.get("expanded_order", [])
+        self.trace_index = 0
+        self.showing_trace = True
+        self.solution_path = res.get("path", [])
+
+    def _compute_ucs(self, level_scene):
+        rows = self._build_rows_from_scene(level_scene)
+        res = ucs_collect_all_stars_with_trace(rows)
+        if not res.get("found"):
+            self.reset()
+            return
+        self.moves = res.get("moves", [])
+        self.move_index = 0
+        self.trace_positions = res.get("expanded_order", [])
+        self.trace_index = 0
+        self.showing_trace = True
         self.solution_path = res.get("path", [])
 
     def handle_event(self, e, level_scene):
         if e.type != pygame.KEYDOWN:
             return
-        # Phím số 1: chạy BFS; các số khác: placeholder
+        # Phím số 1: BFS; 2: DFS; 3: UCS; 4: Greedy; 5: A*
         if e.key == pygame.K_1:
             self.active = "BFS"
             self._compute_bfs(level_scene)
-        elif e.key in (pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9, pygame.K_0):
+        elif e.key == pygame.K_2:
+            self.active = "DFS"
+            self._compute_dfs(level_scene)
+        elif e.key == pygame.K_3:
+            self.active = "UCS"
+            self._compute_ucs(level_scene)
+        elif e.key == pygame.K_4:
+            self.active = "Greedy"
+            self._compute_greedy(level_scene)
+        elif e.key == pygame.K_5:
+            self.active = "AStar"
+            self._compute_astar(level_scene)
+        elif e.key in (pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9, pygame.K_0):
             # Chưa có, tắt AI để người chơi điều khiển
             self.reset()
 
@@ -80,11 +144,9 @@ class AIController:
         """Trả về (dx, dy) bước tiếp theo theo AI, hoặc None nếu không có/đã xong."""
         if self.active is None:
             return None
-        # Nếu đang hiển thị quá trình duyệt, trả None để game update không di chuyển player
         if self.showing_trace:
             return None
         if self.move_index >= len(self.moves):
-            # Hết đường đi => tắt AI
             self.reset()
             return None
         move = self.moves[self.move_index]
@@ -100,7 +162,7 @@ class AIController:
         return None
 
     def tick_trace(self):
-        """Tiến một frame hiển thị duyệt BFS. Khi xong sẽ chuyển sang phát các moves."""
+        """Tiến một frame hiển thị duyệt. Khi xong sẽ chuyển sang phát các moves."""
         if not self.showing_trace:
             return
         self.trace_index += 1
@@ -108,11 +170,7 @@ class AIController:
             self.showing_trace = False
 
     def get_trace_progress(self) -> Tuple[List[Tuple[int, int]], Optional[Tuple[int, int]]]:
-        """Trả về danh sách ô đã duyệt và ô đang focus.
-
-        - visited_list: các ô đã duyệt đến chỉ số trace_index
-        - current: ô hiện tại (nếu còn), else None
-        """
+        """Trả về danh sách ô đã duyệt và ô đang focus."""
         if not self.showing_trace:
             return [], None
         idx = max(0, min(self.trace_index, len(self.trace_positions)))
@@ -123,18 +181,10 @@ class AIController:
         return visited_list, cur
 
     def get_solution_progress(self) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]:
-        """Trả về (visited_nodes, remaining_nodes) theo tiến độ move_index.
-
-        - visited_nodes: các ô đã đi qua (bao gồm start đến vị trí hiện tại)
-        - remaining_nodes: các ô còn lại từ vị trí hiện tại tới đích
-        """
+        """Trả về (visited_nodes, remaining_nodes) theo tiến độ move_index."""
         if not self.solution_path:
             return [], []
-        # path có độ dài = len(moves) + 1
         k = max(0, min(self.move_index, max(0, len(self.solution_path) - 1)))
-        # Tại thời điểm trước khi thực hiện move thứ k+1, đang đứng ở node index k
         visited = self.solution_path[: k + 1]
         remaining = self.solution_path[k + 1 :]
         return visited, remaining
-
-
