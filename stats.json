@@ -692,6 +692,237 @@
       "stars_total": 3,
       "steps": 474,
       "solver": "AStar"
+    },
+    {
+      "ts": 1759373200.609563,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 0,
+      "time_elapsed_sec": 3,
+      "stars_collected": 0,
+      "stars_total": 0,
+      "steps": 14,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759373529.4142952,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 50,
+      "time_elapsed_sec": 40,
+      "stars_collected": 5,
+      "stars_total": 5,
+      "steps": 100,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759373552.6373165,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 50,
+      "time_elapsed_sec": 21,
+      "stars_collected": 5,
+      "stars_total": 5,
+      "steps": 130,
+      "solver": "DFS"
+    },
+    {
+      "ts": 1759373595.7111208,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 50,
+      "time_elapsed_sec": 40,
+      "stars_collected": 5,
+      "stars_total": 5,
+      "steps": 100,
+      "solver": "UCS"
+    },
+    {
+      "ts": 1759373629.1670604,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 50,
+      "time_elapsed_sec": 31,
+      "stars_collected": 5,
+      "stars_total": 5,
+      "steps": 128,
+      "solver": "Greedy"
+    },
+    {
+      "ts": 1759373673.3034914,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 50,
+      "time_elapsed_sec": 41,
+      "stars_collected": 5,
+      "stars_total": 5,
+      "steps": 100,
+      "solver": "AStar"
+    },
+    {
+      "ts": 1759373897.9537873,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 50,
+      "time_elapsed_sec": 26,
+      "stars_collected": 5,
+      "stars_total": 5,
+      "steps": 130,
+      "solver": "DFS"
+    },
+    {
+      "ts": 1759374123.509821,
+      "level_name": "Level 2",
+      "result": "WIN",
+      "score": 20,
+      "time_elapsed_sec": 18,
+      "stars_collected": 2,
+      "stars_total": 2,
+      "steps": 32,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759374133.4314203,
+      "level_name": "Level 2",
+      "result": "WIN",
+      "score": 20,
+      "time_elapsed_sec": 7,
+      "stars_collected": 2,
+      "stars_total": 2,
+      "steps": 32,
+      "solver": "AStar"
+    },
+    {
+      "ts": 1759374228.6677096,
+      "level_name": "Level 3",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 39,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 156,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759374258.2012005,
+      "level_name": "Level 3",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 26,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 180,
+      "solver": "DFS"
+    },
+    {
+      "ts": 1759374298.530248,
+      "level_name": "Level 3",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 38,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 156,
+      "solver": "UCS"
+    },
+    {
+      "ts": 1759374341.453839,
+      "level_name": "Level 3",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 40,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 156,
+      "solver": "Greedy"
+    },
+    {
+      "ts": 1759374383.8244274,
+      "level_name": "Level 3",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 37,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 156,
+      "solver": "AStar"
+    },
+    {
+      "ts": 1759374581.898592,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 29,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 142,
+      "solver": "AStar"
+    },
+    {
+      "ts": 1759374802.430599,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 62,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 218,
+      "solver": "AStar"
+    },
+    {
+      "ts": 1759374942.7254593,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 84,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 400,
+      "solver": "DFS"
+    },
+    {
+      "ts": 1759374986.8223784,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 41,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 250,
+      "solver": "Greedy"
+    },
+    {
+      "ts": 1759375068.8591297,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 79,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 218,
+      "solver": "BFS"
+    },
+    {
+      "ts": 1759375495.4627368,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 85,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 404,
+      "solver": "DFS"
+    },
+    {
+      "ts": 1759375564.735408,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 64,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 218,
+      "solver": "AStar"
     }
   ]
 }
