@@ -44,6 +44,8 @@ class LevelScene(Scene):
         self.img_star_base = load_image("star.png")
         self.img_door_closed_base = load_image("closed_door.png")
         self.img_door_open_base = load_image("open_door.png")
+        # Background image for play area (below header)
+        self.img_bg_base = load_image("background.png")
         # Load all wall variants
         self.img_wall_bases = [
             load_image("tuong1.png"),
@@ -84,6 +86,12 @@ class LevelScene(Scene):
         grid_px_h = self.grid.H * self.tile
         self.offset_x = (screen_w - grid_px_w) // 2
         self.offset_y = header_height + (avail_h - grid_px_h) // 2
+        # Rescale background for the playable area under the header
+        try:
+            bg_height = max(1, screen_h - header_height)
+            self.img_bg = pygame.transform.smoothscale(self.img_bg_base, (screen_w, bg_height))
+        except Exception:
+            self.img_bg = None
         self._rescale_sprites()
 
     def _rescale_sprites(self):
@@ -226,6 +234,9 @@ class LevelScene(Scene):
 
     def draw(self, screen):
         screen.fill(COLOR_BG)
+        # Draw background image under the 80px header so gameplay elements appear on top
+        if getattr(self, 'img_bg', None):
+            screen.blit(self.img_bg, (0, 80))
         
         # Vẽ nền cho tất cả các ô (đường đi)
         for y in range(self.grid.H):
