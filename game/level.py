@@ -43,6 +43,7 @@ class LevelScene(Scene):
         self.img_star_base = load_image("star.png")
         self.img_door_closed_base = load_image("closed_door.png")
         self.img_door_open_base = load_image("open_door.png")
+        self.img_wall_base = load_image("tuong1.png")
 
         # View/scale state for responsive rendering
         self.scale = 1.0
@@ -88,6 +89,8 @@ class LevelScene(Scene):
         star_size = max(2, self.tile // 2)
         self.img_star = pygame.transform.smoothscale(self.img_star_base, (star_size, star_size))
         self.star_half = star_size // 2
+        # Wall fills the entire tile
+        self.img_wall = pygame.transform.smoothscale(self.img_wall_base, (self.tile, self.tile))
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
@@ -185,45 +188,15 @@ class LevelScene(Scene):
         )
         self.game.stats.add(rec)
 
-    def _draw_thin_walls(self, screen):
-        """Vẽ tường kiểu mỏng theo đường viền"""
-        wall_thickness = max(1, self.tile // 16)  # Tường mỏng hơn
-        
+    def _draw_walls(self, screen):
+        """Vẽ tường bằng hình ảnh tuong.png"""
         for y in range(self.grid.H):
             for x in range(self.grid.W):
                 if self.grid.get_cell(x, y) == "1":  # Nếu là tường
                     cell_x = self.offset_x + x * self.tile
                     cell_y = self.offset_y + y * self.tile
-                    
-                    # Kiểm tra các ô xung quanh
-                    top_wall = self.grid.get_cell(x, y-1) == "1"
-                    bottom_wall = self.grid.get_cell(x, y+1) == "1"
-                    left_wall = self.grid.get_cell(x-1, y) == "1"
-                    right_wall = self.grid.get_cell(x+1, y) == "1"
-                    
-                    # Vẽ viền trên
-                    if not top_wall:
-                        pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x, cell_y, self.tile, wall_thickness
-                        ))
-                    
-                    # Vẽ viền dưới
-                    if not bottom_wall:
-                        pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x, cell_y + self.tile - wall_thickness, self.tile, wall_thickness
-                        ))
-                    
-                    # Vẽ viền trái
-                    if not left_wall:
-                        pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x, cell_y, wall_thickness, self.tile
-                        ))
-                    
-                    # Vẽ viền phải
-                    if not right_wall:
-                        pygame.draw.rect(screen, COLOR_WALL, (
-                            cell_x + self.tile - wall_thickness, cell_y, wall_thickness, self.tile
-                        ))
+                    # Vẽ hình ảnh tường cho toàn bộ ô
+                    screen.blit(self.img_wall, (cell_x, cell_y))
 
     def draw(self, screen):
         screen.fill(COLOR_BG)
@@ -238,8 +211,8 @@ class LevelScene(Scene):
                         self.tile, self.tile
                     ))
         
-        # Vẽ tường kiểu mỏng
-        self._draw_thin_walls(screen)
+        # Vẽ tường bằng hình ảnh
+        self._draw_walls(screen)
         
         # Vẽ overlay trực quan hóa BFS nếu đang hiển thị
         if getattr(self.ai, 'showing_trace', False):
