@@ -104,6 +104,16 @@ class MenuScene(Scene):
             screen.blit(text_surface, text_rect)
         
         # Vẽ thông tin nhóm ở dưới cùng bên trái
-        group_text = "251ARIN330585_03CLC_AI_Project_Nhóm 09"
-        group_surface = self.font_tiny.render(group_text, True, self.color_group)
-        screen.blit(group_surface, (20, sh - 30))
+        group_lines = [
+            "251ARIN330585_03CLC_AI_Project_Nhóm 09",
+            "23110110 _ Lê Quang Hưng",
+            "23110078 _ Nguyễn Thái Bảo", 
+            "23110111 _ Lương Nguyễn Thành Hưng"
+        ]
+        
+        line_height = 18
+        start_y = sh - (len(group_lines) * line_height + 10)
+        
+        for i, line_text in enumerate(group_lines):
+            group_surface = self.font_tiny.render(line_text, True, self.color_group)
+            screen.blit(group_surface, (20, start_y + i * line_height))
