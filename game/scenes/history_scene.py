@@ -351,6 +351,12 @@ class HistoryScene(Scene):
         steps_surface = self.font_small.render(steps_text, True, self.color_card_text)
         screen.blit(steps_surface, (x + w - 120, y + 50))
 
+        # Nodes expanded (nếu có và > 0)
+        if hasattr(record, 'nodes_expanded') and record.nodes_expanded > 0:
+            nodes_text = f"Nodes: {record.nodes_expanded}"
+            nodes_surface = self.font_small.render(nodes_text, True, self.color_card_text)
+            screen.blit(nodes_surface, (x + 500, y + 50))
+
         # Solver (nếu có)
         if hasattr(record, 'solver'):
             solver_text = f"Solver: {record.solver}"

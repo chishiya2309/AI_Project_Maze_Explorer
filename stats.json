@@ -9,7 +9,8 @@
       "stars_collected": 0,
       "stars_total": 0,
       "steps": 11,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758162131.5811179,
@@ -20,7 +21,8 @@
       "stars_collected": 0,
       "stars_total": 0,
       "steps": 17,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758162209.3833337,
@@ -31,7 +33,8 @@
       "stars_collected": 1,
       "stars_total": 1,
       "steps": 11,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758163079.3005035,
@@ -42,7 +45,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 65,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758165124.0720928,
@@ -53,7 +57,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 68,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758165378.6563382,
@@ -64,7 +69,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 222,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758172957.1742978,
@@ -75,7 +81,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 70,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758631610.8310177,
@@ -86,7 +93,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 128,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758639628.7819479,
@@ -97,7 +105,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 184,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758680770.5291493,
@@ -108,7 +117,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 256,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758781013.3141189,
@@ -119,7 +129,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 264,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758781141.4946663,
@@ -130,7 +141,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 574,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758782462.5159137,
@@ -141,7 +153,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 332,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758782770.1053696,
@@ -152,7 +165,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 60,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758782925.189113,
@@ -163,7 +177,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 60,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758783328.9199934,
@@ -174,7 +189,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 332,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758784497.587155,
@@ -185,7 +201,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 332,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758785040.1633065,
@@ -196,7 +213,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 332,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758785676.3716602,
@@ -207,7 +225,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 60,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758785693.5744987,
@@ -218,7 +237,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 60,
-      "solver": "HUMAN"
+      "solver": "HUMAN",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758785734.2166593,
@@ -229,7 +249,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 154,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758785781.925326,
@@ -240,7 +261,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 332,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758788896.0799916,
@@ -251,7 +273,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 60,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758789100.5340867,
@@ -262,7 +285,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 332,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758789189.318298,
@@ -273,7 +297,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 154,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758789221.6510649,
@@ -284,7 +309,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 242,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758789436.1266901,
@@ -295,7 +321,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 236,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758938084.5222049,
@@ -306,7 +333,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 236,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758939567.4976447,
@@ -317,7 +345,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 236,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758940291.796943,
@@ -328,7 +357,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 236,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758941347.0306754,
@@ -339,7 +369,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 236,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758941356.8621252,
@@ -350,7 +381,8 @@
       "stars_collected": 2,
       "stars_total": 2,
       "steps": 54,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758948039.679602,
@@ -361,7 +393,8 @@
       "stars_collected": 0,
       "stars_total": 0,
       "steps": 56,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758983674.658556,
@@ -372,7 +405,8 @@
       "stars_collected": 1,
       "stars_total": 1,
       "steps": 60,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758983888.5935993,
@@ -383,7 +417,8 @@
       "stars_collected": 2,
       "stars_total": 2,
       "steps": 138,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758984867.2348409,
@@ -394,7 +429,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 256,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758988647.9486196,
@@ -405,7 +441,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 60,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758988666.4078074,
@@ -416,7 +453,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 120,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1758988990.020743,
@@ -427,7 +465,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 256,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759065514.6769261,
@@ -438,7 +477,8 @@
       "stars_collected": 1,
       "stars_total": 1,
       "steps": 94,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759116353.4405107,
@@ -449,7 +489,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 204,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759122568.158903,
@@ -460,7 +501,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 474,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759322743.8988118,
@@ -471,7 +513,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 60,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759322954.9781249,
@@ -482,7 +525,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 120,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759322995.703949,
@@ -493,7 +537,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 156,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759323044.98535,
@@ -504,7 +549,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 242,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759323102.7776394,
@@ -515,7 +561,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 256,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759323195.212537,
@@ -526,7 +573,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 236,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759323384.565082,
@@ -537,7 +585,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 256,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759323493.5338736,
@@ -548,7 +597,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 474,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759353561.4881,
@@ -559,7 +609,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 60,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759353593.859078,
@@ -570,7 +621,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 120,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759353636.938884,
@@ -581,7 +633,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 156,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759354262.408232,
@@ -592,7 +645,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 120,
-      "solver": "AStar"
+      "solver": "AStar",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759354375.722975,
@@ -603,7 +657,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 156,
-      "solver": "Greedy"
+      "solver": "Greedy",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759354418.0214322,
@@ -614,7 +669,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 156,
-      "solver": "AStar"
+      "solver": "AStar",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759354793.524759,
@@ -625,7 +681,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 242,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759354826.8936992,
@@ -636,7 +693,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 154,
-      "solver": "DFS"
+      "solver": "DFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759354863.243867,
@@ -647,7 +705,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 154,
-      "solver": "UCS"
+      "solver": "UCS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759354891.126633,
@@ -658,7 +717,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 154,
-      "solver": "Greedy"
+      "solver": "Greedy",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759354925.764809,
@@ -669,7 +729,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 154,
-      "solver": "DFS"
+      "solver": "DFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759354960.976992,
@@ -680,7 +741,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 154,
-      "solver": "AStar"
+      "solver": "AStar",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759355069.3993988,
@@ -691,7 +753,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 474,
-      "solver": "AStar"
+      "solver": "AStar",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759373200.609563,
@@ -702,7 +765,8 @@
       "stars_collected": 0,
       "stars_total": 0,
       "steps": 14,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759373529.4142952,
@@ -713,7 +777,8 @@
       "stars_collected": 5,
       "stars_total": 5,
       "steps": 100,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759373552.6373165,
@@ -724,7 +789,8 @@
       "stars_collected": 5,
       "stars_total": 5,
       "steps": 130,
-      "solver": "DFS"
+      "solver": "DFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759373595.7111208,
@@ -735,7 +801,8 @@
       "stars_collected": 5,
       "stars_total": 5,
       "steps": 100,
-      "solver": "UCS"
+      "solver": "UCS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759373629.1670604,
@@ -746,7 +813,8 @@
       "stars_collected": 5,
       "stars_total": 5,
       "steps": 128,
-      "solver": "Greedy"
+      "solver": "Greedy",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759373673.3034914,
@@ -757,7 +825,8 @@
       "stars_collected": 5,
       "stars_total": 5,
       "steps": 100,
-      "solver": "AStar"
+      "solver": "AStar",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759373897.9537873,
@@ -768,7 +837,8 @@
       "stars_collected": 5,
       "stars_total": 5,
       "steps": 130,
-      "solver": "DFS"
+      "solver": "DFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759374123.509821,
@@ -779,7 +849,8 @@
       "stars_collected": 2,
       "stars_total": 2,
       "steps": 32,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759374133.4314203,
@@ -790,7 +861,8 @@
       "stars_collected": 2,
       "stars_total": 2,
       "steps": 32,
-      "solver": "AStar"
+      "solver": "AStar",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759374228.6677096,
@@ -801,7 +873,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 156,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759374258.2012005,
@@ -812,7 +885,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 180,
-      "solver": "DFS"
+      "solver": "DFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759374298.530248,
@@ -823,7 +897,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 156,
-      "solver": "UCS"
+      "solver": "UCS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759374341.453839,
@@ -834,7 +909,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 156,
-      "solver": "Greedy"
+      "solver": "Greedy",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759374383.8244274,
@@ -845,7 +921,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 156,
-      "solver": "AStar"
+      "solver": "AStar",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759374581.898592,
@@ -856,7 +933,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 142,
-      "solver": "AStar"
+      "solver": "AStar",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759374802.430599,
@@ -867,7 +945,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 218,
-      "solver": "AStar"
+      "solver": "AStar",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759374942.7254593,
@@ -878,7 +957,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 400,
-      "solver": "DFS"
+      "solver": "DFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759374986.8223784,
@@ -889,7 +969,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 250,
-      "solver": "Greedy"
+      "solver": "Greedy",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759375068.8591297,
@@ -900,7 +981,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 218,
-      "solver": "BFS"
+      "solver": "BFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759375495.4627368,
@@ -911,7 +993,8 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 404,
-      "solver": "DFS"
+      "solver": "DFS",
+      "nodes_expanded": 0
     },
     {
       "ts": 1759375564.735408,
@@ -922,7 +1005,92 @@
       "stars_collected": 3,
       "stars_total": 3,
       "steps": 218,
-      "solver": "AStar"
+      "solver": "AStar",
+      "nodes_expanded": 0
+    },
+    {
+      "ts": 1759466570.626083,
+      "level_name": "Level 3",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 38,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 156,
+      "solver": "AStar",
+      "nodes_expanded": 0
+    },
+    {
+      "ts": 1759466821.0664768,
+      "level_name": "Level 3",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 37,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 156,
+      "solver": "BFS",
+      "nodes_expanded": 0
+    },
+    {
+      "ts": 1759466867.0364401,
+      "level_name": "Level 3",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 26,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 180,
+      "solver": "DFS",
+      "nodes_expanded": 0
+    },
+    {
+      "ts": 1759466965.8422616,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 63,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 218,
+      "solver": "AStar",
+      "nodes_expanded": 0
+    },
+    {
+      "ts": 1759467053.0384626,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 84,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 404,
+      "solver": "DFS",
+      "nodes_expanded": 0
+    },
+    {
+      "ts": 1759467592.0698874,
+      "level_name": "Level 2",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 25,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 120,
+      "solver": "AStar",
+      "nodes_expanded": 695
+    },
+    {
+      "ts": 1759467706.683997,
+      "level_name": "Level 3",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 39,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 156,
+      "solver": "BFS",
+      "nodes_expanded": 1192
     }
   ]
 }

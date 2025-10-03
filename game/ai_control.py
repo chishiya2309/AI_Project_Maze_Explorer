@@ -17,6 +17,8 @@ class AIController:
         self.showing_trace: bool = False
         # Solution execution visualization
         self.solution_path: List[Tuple[int, int]] = []  # gồm cả điểm bắt đầu
+        # Thống kê thuật toán
+        self.nodes_expanded: int = 0  # Số nút đã duyệt
 
     def reset(self):
         self.active = None
@@ -26,6 +28,7 @@ class AIController:
         self.trace_index = 0
         self.showing_trace = False
         self.solution_path = []
+        self.nodes_expanded = 0
 
     def _build_rows_from_scene(self, level_scene) -> List[str]:
         # Tạo lưới ký tự từ scene hiện tại: sử dụng tường từ grid, sao theo remaining, S/G theo vị trí hiện tại
@@ -64,6 +67,7 @@ class AIController:
         self.trace_index = 0
         self.showing_trace = True
         self.solution_path = res.get("path", [])
+        self.nodes_expanded = res.get("nodes_expanded", 0)
 
     def _compute_astar(self, level_scene):
         rows = self._build_rows_from_scene(level_scene)
@@ -77,6 +81,7 @@ class AIController:
         self.trace_index = 0
         self.showing_trace = True
         self.solution_path = res.get("path", [])
+        self.nodes_expanded = res.get("nodes_expanded", 0)
 
     def _compute_greedy(self, level_scene):
         rows = self._build_rows_from_scene(level_scene)
@@ -90,6 +95,7 @@ class AIController:
         self.trace_index = 0
         self.showing_trace = True
         self.solution_path = res.get("path", [])
+        self.nodes_expanded = res.get("nodes_expanded", 0)
 
     def _compute_dfs(self, level_scene):
         rows = self._build_rows_from_scene(level_scene)
@@ -103,6 +109,7 @@ class AIController:
         self.trace_index = 0
         self.showing_trace = True
         self.solution_path = res.get("path", [])
+        self.nodes_expanded = res.get("nodes_expanded", 0)
 
     def _compute_ucs(self, level_scene):
         rows = self._build_rows_from_scene(level_scene)
@@ -116,28 +123,35 @@ class AIController:
         self.trace_index = 0
         self.showing_trace = True
         self.solution_path = res.get("path", [])
+        self.nodes_expanded = res.get("nodes_expanded", 0)
 
     def handle_event(self, e, level_scene):
         if e.type != pygame.KEYDOWN:
             return
         # Phím số 1: BFS; 2: DFS; 3: UCS; 4: Greedy; 5: A*
         if e.key == pygame.K_1:
+            level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.active = "BFS"
             self._compute_bfs(level_scene)
         elif e.key == pygame.K_2:
+            level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.active = "DFS"
             self._compute_dfs(level_scene)
         elif e.key == pygame.K_3:
+            level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.active = "UCS"
             self._compute_ucs(level_scene)
         elif e.key == pygame.K_4:
+            level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.active = "Greedy"
             self._compute_greedy(level_scene)
         elif e.key == pygame.K_5:
+            level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.active = "AStar"
             self._compute_astar(level_scene)
         elif e.key in (pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9, pygame.K_0):
             # Chưa có, tắt AI để người chơi điều khiển
+            level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.reset()
 
     def get_next_step(self) -> Optional[Tuple[int, int]]:

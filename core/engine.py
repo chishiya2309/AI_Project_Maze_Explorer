@@ -39,6 +39,7 @@ class PlayRecord:
     stars_total: int
     steps: int
     solver: str = "HUMAN"  # HUMAN | BFS | ...
+    nodes_expanded: int = 0  # Số nút đã duyệt bởi thuật toán
 
 class StatsStore:
     def __init__(self, path: str):
