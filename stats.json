@@ -1091,6 +1091,42 @@
       "steps": 156,
       "solver": "BFS",
       "nodes_expanded": 1192
+    },
+    {
+      "ts": 1759477057.7591484,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 63,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 218,
+      "solver": "AStar",
+      "nodes_expanded": 2342
+    },
+    {
+      "ts": 1759477288.9185889,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 63,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 218,
+      "solver": "AStar",
+      "nodes_expanded": 2342
+    },
+    {
+      "ts": 1759477459.7474332,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 83,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 404,
+      "solver": "DFS",
+      "nodes_expanded": 2261
     }
   ]
 }

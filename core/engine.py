@@ -70,6 +70,18 @@ class StatsStore:
 class GameApp:
     def __init__(self):
         pygame.init()
+        # Init audio and start background music (looped)
+        try:
+            if not pygame.mixer.get_init():
+                pygame.mixer.init()
+            music_path = os.path.join("data", "sounds", "music_background.mp3")
+            if os.path.isfile(music_path):
+                pygame.mixer.music.load(music_path)
+                pygame.mixer.music.set_volume(0.6)
+                pygame.mixer.music.play(-1)  # loop indefinitely
+        except Exception:
+            # If audio fails, continue without background music
+            pass
         # Luôn mở fullscreen, không cho phép resize
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         pygame.display.set_caption("Maze Explorer")
@@ -93,4 +105,8 @@ class GameApp:
             self.scenes.update(dt)
             self.scenes.draw(self.screen)
             pygame.display.flip()
+        try:
+            pygame.mixer.music.stop()
+        except Exception:
+            pass
         pygame.quit()
