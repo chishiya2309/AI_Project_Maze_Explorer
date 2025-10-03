@@ -61,6 +61,9 @@ class LevelScene(Scene):
         self.img_bunny_down_base = load_image("bunny_down.png")
         self.img_bunny_left_base = load_image("bunny_left.png")
         self.img_bunny_right_base = load_image("bunny_right.png")
+        
+        # Load chang e image for final map goal
+        self.img_chang_e_base = load_image("chang e.png")
 
         # View/scale state for responsive rendering
         self.scale = 1.0
@@ -123,6 +126,10 @@ class LevelScene(Scene):
         self.img_bunny_down = pygame.transform.smoothscale(self.img_bunny_down_base, (bunny_size, bunny_size))
         self.img_bunny_left = pygame.transform.smoothscale(self.img_bunny_left_base, (bunny_size, bunny_size))
         self.img_bunny_right = pygame.transform.smoothscale(self.img_bunny_right_base, (bunny_size, bunny_size))
+        
+        # Scale chang e image to fit tile size (for final map goal)
+        chang_e_size = max(8, self.tile - 4)  # Same size as bunny
+        self.img_chang_e = pygame.transform.smoothscale(self.img_chang_e_base, (chang_e_size, chang_e_size))
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
@@ -342,12 +349,23 @@ class LevelScene(Scene):
         # Vẽ goal
         gx, gy = self.goal
         is_open = self.star_collector.is_complete()
-        img = self.img_door_open if is_open else self.img_door_closed
-        pad = self.door_pad
-        screen.blit(img, (
-            self.offset_x + gx * self.tile + pad,
-            self.offset_y + gy * self.tile + pad
-        ))
+        
+        # Check if this is the final map (level 8)
+        if self.name == "Level 8":
+            # For final map, show chang e.png instead of door
+            cx = self.offset_x + gx * self.tile + self.tile // 2
+            cy = self.offset_y + gy * self.tile + self.tile // 2
+            # Center the chang e sprite
+            sprite_rect = self.img_chang_e.get_rect(center=(cx, cy))
+            screen.blit(self.img_chang_e, sprite_rect)
+        else:
+            # For other maps, show door as usual
+            img = self.img_door_open if is_open else self.img_door_closed
+            pad = self.door_pad
+            screen.blit(img, (
+                self.offset_x + gx * self.tile + pad,
+                self.offset_y + gy * self.tile + pad
+            ))
         
         # Vẽ player (bunny sprite)
         px = self.offset_x + self.player.gx * self.tile + self.tile // 2
