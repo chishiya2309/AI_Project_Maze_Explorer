@@ -128,6 +128,7 @@ def bfs_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
             "stars_total": len(stars),
             "found": False,
             "expanded_order": expanded_order,
+            "nodes_expanded": len(expanded_order),
         }
 
     path, moves = _reconstruct_path(parents, end_state)
@@ -139,4 +140,5 @@ def bfs_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
         "stars_total": len(stars),
         "found": True,
         "expanded_order": expanded_order,
+        "nodes_expanded": len(expanded_order),
     }

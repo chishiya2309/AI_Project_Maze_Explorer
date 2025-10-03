@@ -218,6 +218,28 @@ class LevelScene(Scene):
         if player_pos == self.goal and self.star_collector.is_complete():
             self._finish()
 
+    def reset_game_state(self):
+        """Reset game về trạng thái ban đầu"""
+        # Reset player về vị trí ban đầu
+        start_pos, _ = self.grid.find_start_goal()
+        self.player.gx, self.player.gy = start_pos
+        self.player.direction = "down"  # Reset hướng về mặc định
+        
+        # Reset star collector về trạng thái ban đầu
+        stars = self.grid.find_stars()
+        self.star_collector = StarCollector(stars)
+        
+        # Reset game state
+        self.score = 0
+        self.steps = 0
+        self.time_elapsed = 0
+        self.cool = 0
+        self.result = None
+        self.timer = 0
+        
+        # Reset AI controller
+        self.ai.reset()
+
     def _finish(self):
         """Kết thúc level"""
         self.result = "WIN"
@@ -233,7 +255,8 @@ class LevelScene(Scene):
             stars_collected=self.star_collector.stars_collected,
             stars_total=self.star_collector.stars_total,
             steps=self.steps,
-            solver=(self.ai.active if self.ai.active else "HUMAN")
+            solver=(self.ai.active if self.ai.active else "HUMAN"),
+            nodes_expanded=self.ai.nodes_expanded
         )
         self.game.stats.add(rec)
 
@@ -352,7 +375,6 @@ class LevelScene(Scene):
         
         # Check if this is the final map (level 8)
         if self.name == "Level 8":
-            # For final map, show chang e.png instead of door
             cx = self.offset_x + gx * self.tile + self.tile // 2
             cy = self.offset_y + gy * self.tile + self.tile // 2
             # Center the chang e sprite
