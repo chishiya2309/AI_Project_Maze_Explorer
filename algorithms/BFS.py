@@ -38,12 +38,10 @@ def _parse_level(rows: List[str]) -> Tuple[Position, Position, List[Position], i
 
     return start, goal, stars, width, height
 
-
 def _is_blocked(rows: List[str], x: int, y: int, width: int, height: int) -> bool:
     if x < 0 or y < 0 or x >= width or y >= height:
         return True
     return rows[y][x] == "1"
-
 
 def _reconstruct_path(
     parents: Dict[State, Tuple[Optional[State], str]],
@@ -142,5 +140,3 @@ def bfs_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
         "found": True,
         "expanded_order": expanded_order,
     }
-
-
