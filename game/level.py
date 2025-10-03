@@ -63,7 +63,7 @@ class LevelScene(Scene):
         self.img_bunny_right_base = load_image("bunny_right.png")
         
         # Load chang e image for final map goal
-        self.img_chang_e_base = load_image("chang e.png")
+        self.img_chang_e_base = load_image("chang_e.png")
 
         # View/scale state for responsive rendering
         self.scale = 1.0
