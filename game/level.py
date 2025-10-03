@@ -41,7 +41,7 @@ class LevelScene(Scene):
         # HUD
         self.hud = HUD()
         # Load images first (needed before layout scaling)
-        self.img_star_base = load_image("star.png")
+        self.img_carrot_base = load_image("carrot.png")
         self.img_door_closed_base = load_image("closed_door.png")
         self.img_door_open_base = load_image("open_door.png")
         # Background image for play area (below header)
@@ -108,10 +108,10 @@ class LevelScene(Scene):
         self.door_pad = pad
         self.img_door_closed = pygame.transform.smoothscale(self.img_door_closed_base, (door_size, door_size))
         self.img_door_open = pygame.transform.smoothscale(self.img_door_open_base, (door_size, door_size))
-        # Star takes about half of the tile
-        star_size = max(2, self.tile // 2)
-        self.img_star = pygame.transform.smoothscale(self.img_star_base, (star_size, star_size))
-        self.star_half = star_size // 2
+        # Carrot takes about half of the tile
+        carrot_size = max(2, self.tile // 2)
+        self.img_carrot = pygame.transform.smoothscale(self.img_carrot_base, (carrot_size, carrot_size))
+        self.carrot_half = carrot_size // 2
         # Wall fills the entire tile - scale variants
         self.img_walls = [
             pygame.transform.smoothscale(img, (self.tile, self.tile))
@@ -333,11 +333,11 @@ class LevelScene(Scene):
                         ),
                     )
 
-        # Vẽ ngôi sao bằng ảnh
+        # Vẽ cà rốt bằng ảnh
         for (x, y) in self.star_collector.get_remaining_stars():
             cx = self.offset_x + x * self.tile + self.tile // 2
             cy = self.offset_y + y * self.tile + self.tile // 2
-            screen.blit(self.img_star, (cx - self.star_half, cy - self.star_half))
+            screen.blit(self.img_carrot, (cx - self.carrot_half, cy - self.carrot_half))
         
         # Vẽ goal
         gx, gy = self.goal
