@@ -5,3 +5,4 @@ from dataclasses import dataclass
 class Player: 
     gx: int
     gy: int
+    direction: str = "down"  # "up", "down", "left", "right"

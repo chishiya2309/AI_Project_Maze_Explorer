@@ -55,6 +55,12 @@ class LevelScene(Scene):
         ]
         # Build a deterministic random index map per wall cell so textures stay stable while playing
         self._build_wall_variant_map()
+        
+        # Load individual bunny direction images
+        self.img_bunny_up_base = load_image("bunny_up.png")
+        self.img_bunny_down_base = load_image("bunny_down.png")
+        self.img_bunny_left_base = load_image("bunny_left.png")
+        self.img_bunny_right_base = load_image("bunny_right.png")
 
         # View/scale state for responsive rendering
         self.scale = 1.0
@@ -111,6 +117,12 @@ class LevelScene(Scene):
             pygame.transform.smoothscale(img, (self.tile, self.tile))
             for img in self.img_wall_bases
         ]
+        # Scale bunny images to fit tile size
+        bunny_size = max(8, self.tile - 4)  # Slightly smaller than tile
+        self.img_bunny_up = pygame.transform.smoothscale(self.img_bunny_up_base, (bunny_size, bunny_size))
+        self.img_bunny_down = pygame.transform.smoothscale(self.img_bunny_down_base, (bunny_size, bunny_size))
+        self.img_bunny_left = pygame.transform.smoothscale(self.img_bunny_left_base, (bunny_size, bunny_size))
+        self.img_bunny_right = pygame.transform.smoothscale(self.img_bunny_right_base, (bunny_size, bunny_size))
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
@@ -171,6 +183,16 @@ class LevelScene(Scene):
                     dy = 1
             
             if dx or dy:
+                # Update direction based on movement
+                if dx < 0:
+                    self.player.direction = "left"
+                elif dx > 0:
+                    self.player.direction = "right"
+                elif dy < 0:
+                    self.player.direction = "up"
+                elif dy > 0:
+                    self.player.direction = "down"
+                
                 nx, ny = self.player.gx + dx, self.player.gy + dy
                 if not self.grid.is_blocked(nx, ny):
                     self.player.gx, self.player.gy = nx, ny
@@ -327,10 +349,26 @@ class LevelScene(Scene):
             self.offset_y + gy * self.tile + pad
         ))
         
-        # Vẽ player
+        # Vẽ player (bunny sprite)
         px = self.offset_x + self.player.gx * self.tile + self.tile // 2
         py = self.offset_y + self.player.gy * self.tile + self.tile // 2
-        pygame.draw.circle(screen, COLOR_PLAYER, (px, py), max(3, self.tile // 3))
+        
+        # Select appropriate bunny image based on direction
+        direction = self.player.direction
+        if direction == "up":
+            bunny_img = self.img_bunny_up
+        elif direction == "down":
+            bunny_img = self.img_bunny_down
+        elif direction == "left":
+            bunny_img = self.img_bunny_left
+        elif direction == "right":
+            bunny_img = self.img_bunny_right
+        else:
+            bunny_img = self.img_bunny_down  # Default fallback
+        
+        # Center the sprite
+        sprite_rect = bunny_img.get_rect(center=(px, py))
+        screen.blit(bunny_img, sprite_rect)
         
         # Vẽ HUD
         self.hud.draw_game_hud(
