@@ -9,6 +9,7 @@ from .level_select_scene import LevelSelectScene
 from .edit_level_select_scene import EditLevelSelectScene
 from .map_size_selection_scene import MapSizeSelectionScene
 from .edit_map_scene import EditMapScene
+from .ending_scene import EndingScene
 
 __all__ = [
     'MenuScene',
@@ -16,5 +17,6 @@ __all__ = [
     'LevelSelectScene',
     'EditLevelSelectScene',
     'MapSizeSelectionScene',
-    'EditMapScene'
+    'EditMapScene',
+    'EndingScene'
 ]

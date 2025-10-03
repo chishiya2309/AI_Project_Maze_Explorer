@@ -1,6 +1,6 @@
 import pygame
 from core.scene import Scene
-from core.assets import scan_levels
+from core.assets import scan_levels, load_image
 
 
 class LevelSelectScene(Scene):
@@ -14,6 +14,9 @@ class LevelSelectScene(Scene):
         self.hovered_level = -1  # Track which level is being hovered
         self.hovered_back = False  # Track if back button is hovered
         
+        # Background image for level select screen
+        self.bg_image = load_image("level_background.png")
+
         # Colors
         self.color_bg = (20, 40, 30)  # Dark green background
         self.color_bg_pattern = (15, 35, 25)  # Darker green for pattern
@@ -134,15 +137,13 @@ class LevelSelectScene(Scene):
         return -1
     
     def draw(self, screen):
-        # Background with pattern
-        screen.fill(self.color_bg)
+        # Background image first
         sw, sh = screen.get_size()
-        
-        # Draw subtle pattern
-        for y in range(0, sh, 20):
-            for x in range(0, sw, 20):
-                if (x + y) % 40 == 0:
-                    pygame.draw.rect(screen, self.color_bg_pattern, (x, y, 20, 20))
+        if self.bg_image:
+            bg_scaled = pygame.transform.smoothscale(self.bg_image, (sw, sh))
+            screen.blit(bg_scaled, (0, 0))
+        else:
+            screen.fill(self.color_bg)
         
         # Back button
         back_rect = pygame.Rect(30, 30, 80, 40)

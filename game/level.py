@@ -243,7 +243,13 @@ class LevelScene(Scene):
     def _finish(self):
         """Kết thúc level"""
         self.result = "WIN"
-        self.timer = 1200
+        # Với Level 8, chuyển sang EndingScene ngay lập tức
+        if self.name == "Level 8":
+            from game.scenes import EndingScene
+            self.game.scenes.switch(EndingScene(self.game))
+            # Vẫn ghi lại record trước khi chuyển cảnh
+        else:
+            self.timer = 1200
         
         # Ghi lại record
         rec = PlayRecord(
