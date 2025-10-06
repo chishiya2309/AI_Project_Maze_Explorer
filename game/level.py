@@ -75,6 +75,8 @@ class LevelScene(Scene):
         self._recompute_layout()
         # AI controller (mặc định: người chơi điều khiển)
         self.ai = AIController()
+        # Lưu số nút mở rộng khi hoàn tất để hiển thị sau khi xong
+        self.nodes_expanded_display = 0
         # Font hiển thị trạng thái AI
         self.font_ai = pygame.font.SysFont("segoeui", 18, bold=True)
         # Font hiển thị thông tin nhóm
@@ -254,6 +256,7 @@ class LevelScene(Scene):
         
         # Reset AI controller
         self.ai.reset()
+        self.nodes_expanded_display = 0
 
     def _finish(self):
         """Kết thúc level"""
@@ -281,6 +284,8 @@ class LevelScene(Scene):
             nodes_expanded=self.ai.nodes_expanded
         )
         self.game.stats.add(rec)
+        # Lưu để hiển thị trên HUD sau khi hoàn tất thực thi lời giải
+        self.nodes_expanded_display = self.ai.nodes_expanded
 
     def _draw_walls(self, screen):
         """Vẽ tường bằng hình ảnh tuong.png"""
@@ -325,10 +330,10 @@ class LevelScene(Scene):
         # Vẽ tường bằng hình ảnh
         self._draw_walls(screen)
         
-        # Vẽ overlay trực quan hóa BFS nếu đang hiển thị
+        # Vẽ overlay trực quan hóa quá trình tìm kiếm nếu đang hiển thị
         if getattr(self.ai, 'showing_trace', False):
             visited, cur = self.ai.get_trace_progress()
-            # Các ô đã mở rộng: xanh lam nhạt
+            # Các ô đã mở rộng: CYAN tươi, alpha trung bình để nổi bật
             for (vx, vy) in visited:
                 if self.grid.get_cell(vx, vy) == '1':
                     continue
@@ -338,9 +343,9 @@ class LevelScene(Scene):
                     self.tile, self.tile
                 )
                 s = pygame.Surface((self.tile, self.tile), pygame.SRCALPHA)
-                s.fill((80, 150, 255, 70))  # alpha nhẹ
+                s.fill((0, 200, 255, 110))  # cyan, rõ hơn
                 screen.blit(s, rect.topleft)
-            # Ô hiện tại: xanh lam đậm
+            # Ô hiện tại: TEAL đậm hơn + viền trắng để nhấn mạnh
             if cur is not None:
                 cx, cy = cur
                 if self.grid.get_cell(cx, cy) != '1':
@@ -350,16 +355,18 @@ class LevelScene(Scene):
                         self.tile, self.tile
                     )
                     s = pygame.Surface((self.tile, self.tile), pygame.SRCALPHA)
-                    s.fill((30, 200, 255, 120))
+                    s.fill((0, 255, 200, 160))  # teal đậm
                     screen.blit(s, rect.topleft)
+                    # Viền trắng 2px để cực kỳ nổi bật trên mọi nền
+                    pygame.draw.rect(screen, (255, 255, 255), rect, 2)
 
         # Vẽ overlay quá trình thực thi lời giải (sau khi trace xong và đang phát moves)
         if self.ai.active and not getattr(self.ai, 'showing_trace', False):
             visited_nodes, remaining_nodes = self.ai.get_solution_progress()
-            # visited: xanh lá nhạt
+            # visited: XANH LÁ sáng, alpha lớn để dễ thấy
             if visited_nodes:
                 s_visited = pygame.Surface((self.tile, self.tile), pygame.SRCALPHA)
-                s_visited.fill((60, 220, 120, 90))
+                s_visited.fill((0, 255, 0, 130))
                 for (vx, vy) in visited_nodes:
                     if self.grid.get_cell(vx, vy) == '1':
                         continue
@@ -370,10 +377,10 @@ class LevelScene(Scene):
                             self.offset_y + vy * self.tile,
                         ),
                     )
-            # remaining: vàng nhạt
+            # remaining: TÍM/MAGENTA để phân biệt rõ với visited và trace
             if remaining_nodes:
                 s_remain = pygame.Surface((self.tile, self.tile), pygame.SRCALPHA)
-                s_remain.fill((255, 220, 80, 70))
+                s_remain.fill((200, 80, 255, 110))
                 for (rx, ry) in remaining_nodes:
                     if self.grid.get_cell(rx, ry) == '1':
                         continue
@@ -436,7 +443,7 @@ class LevelScene(Scene):
         self.hud.draw_game_hud(
             screen, self.name, self.time_elapsed, self.score,
             self.star_collector.stars_collected, self.star_collector.stars_total,
-            self.steps
+            self.steps, (self.nodes_expanded_display if self.result == "WIN" else None)
         )
         
         # Vẽ kết quả
@@ -469,22 +476,6 @@ class LevelScene(Scene):
             bg_rect = rect.inflate(12, 8)
             pygame.draw.rect(screen, (0, 0, 0, 0), bg_rect)  # opaque dark bg
             screen.blit(surf, rect)
-        
-        # Hiển thị thông tin nhóm ở góc dưới bên trái
-        sw, sh = screen.get_size()
-        group_lines = [
-            "251ARIN330585_03CLC_AI_Project_Nhóm 09",
-            "23110110 _ Lê Quang Hưng",
-            "23110078 _ Nguyễn Thái Bảo", 
-            "23110111 _ Lương Nguyễn Thành Hưng"
-        ]
-        
-        line_height = 16
-        start_y = sh - (len(group_lines) * line_height + 10)
-        
-        for i, line_text in enumerate(group_lines):
-            group_surface = self.font_group.render(line_text, True, (150, 150, 150))
-            screen.blit(group_surface, (20, start_y + i * line_height))
 
     def _go_next_level(self):
         """Chuyển sang level kế tiếp nếu có (không áp dụng cho Level 8)."""

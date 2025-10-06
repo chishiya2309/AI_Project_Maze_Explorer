@@ -19,6 +19,11 @@ class MenuScene(Scene):
         self.color_button_text = (100, 255, 100)  # Màu xanh lá cây sáng
         self.color_text = (200, 200, 200)
         self.color_group = (150, 150, 150)
+        # Panel highlight colors for Team section
+        self.color_panel_bg = (0, 0, 0, 140)  # semi-transparent (used via Surface with alpha)
+        self.color_panel_border = (100, 150, 255)
+        self.color_panel_title = (255, 255, 255)
+        self.color_panel_text = (210, 220, 230)
 
         # Background image for main menu
         self.bg_image = load_image("menu_background.png")
@@ -112,17 +117,41 @@ class MenuScene(Scene):
             text_rect = text_surface.get_rect(center=((sw - button_width) // 2 + button_width // 2, button_y + i * button_spacing + button_height // 2))
             screen.blit(text_surface, text_rect)
         
-        # Vẽ thông tin nhóm ở dưới cùng bên trái
+        # Vẽ panel nổi bật hiển thị thông tin nhóm (góc phải dưới)
+        group_title = "Team 09"
         group_lines = [
-            "251ARIN330585_03CLC_AI_Project_Nhóm 09",
-            "23110110 _ Lê Quang Hưng",
-            "23110078 _ Nguyễn Thái Bảo", 
-            "23110111 _ Lương Nguyễn Thành Hưng"
+            "251ARIN330585_03CLC_AI_Project",
+            "23110110 - Lê Quang Hưng",
+            "23110078 - Nguyễn Thái Bảo",
+            "23110111 - Lương Nguyễn Thành Hưng",
         ]
-        
-        line_height = 18
-        start_y = sh - (len(group_lines) * line_height + 10)
-        
-        for i, line_text in enumerate(group_lines):
-            group_surface = self.font_tiny.render(line_text, True, self.color_group)
-            screen.blit(group_surface, (20, start_y + i * line_height))
+
+        # Kích thước panel
+        pad_x, pad_y = 16, 12
+        content_width = 0
+        # Đo kích thước văn bản để tính panel
+        title_surf = self.font_small.render(group_title, True, self.color_panel_title)
+        content_width = max(content_width, title_surf.get_width())
+        line_surfs = [self.font_tiny.render(t, True, self.color_panel_text) for t in group_lines]
+        for srf in line_surfs:
+            content_width = max(content_width, srf.get_width())
+        content_height = title_surf.get_height() + 8 + sum(s.get_height() for s in line_surfs) + (len(line_surfs) - 1) * 4
+
+        panel_width = content_width + pad_x * 2
+        panel_height = content_height + pad_y * 2
+        panel_x = sw - panel_width - 24
+        panel_y = sh - panel_height - 24
+
+        # Nền panel bán trong suốt
+        panel_surface = pygame.Surface((panel_width, panel_height), pygame.SRCALPHA)
+        panel_surface.fill(self.color_panel_bg)
+        # Vẽ viền panel
+        pygame.draw.rect(panel_surface, self.color_panel_border, panel_surface.get_rect(), width=2, border_radius=10)
+        screen.blit(panel_surface, (panel_x, panel_y))
+
+        # Vẽ nội dung panel
+        screen.blit(title_surf, (panel_x + pad_x, panel_y + pad_y))
+        y_cursor = panel_y + pad_y + title_surf.get_height() + 8
+        for srf in line_surfs:
+            screen.blit(srf, (panel_x + pad_x, y_cursor))
+            y_cursor += srf.get_height() + 4

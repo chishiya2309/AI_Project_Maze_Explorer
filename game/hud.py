@@ -10,6 +10,11 @@ class HUD:
         self.timer_font = pygame.font.SysFont("segoeui", 24, bold=True)
         self.instruction_font = pygame.font.SysFont("segoeui", 18)
         self.small_font = pygame.font.SysFont("segoeui", 16)
+        # Colors for team panel
+        self.color_panel_bg = (0, 0, 0, 140)
+        self.color_panel_border = (100, 150, 255)
+        self.color_panel_title = (255, 255, 255)
+        self.color_panel_text = (210, 220, 230)
     
     def format_time(self, ms: int) -> str:
         """Format thời gian từ milliseconds thành MM:SS"""
@@ -17,7 +22,7 @@ class HUD:
         return f"{sec//60:02d}:{sec%60:02d}"
     
     def draw_game_hud(self, screen, level_name: str, time_elapsed: int, score: int, 
-                     stars_collected: int, stars_total: int, steps: int):
+                     stars_collected: int, stars_total: int, steps: int, nodes_expanded):
         """Vẽ HUD trong game với layout mới"""
         sw, sh = screen.get_size()
         
@@ -53,6 +58,14 @@ class HUD:
         steps_text = self.small_font.render(f"Steps: {steps}", True, (220, 230, 240))
         steps_rect = steps_text.get_rect(topright=(sw - 20, 200))
         screen.blit(steps_text, steps_rect)
+        # Nodes expanded (under steps) - chỉ hiển thị sau khi hoàn tất (khi không phải None)
+        if nodes_expanded is not None:
+            expanded_text = self.small_font.render(f"Expanded: {nodes_expanded}", True, (255, 200, 120))
+            expanded_rect = expanded_text.get_rect(topright=(sw - 20, 220))
+            screen.blit(expanded_text, expanded_rect)
+        
+        # Team panel (bottom-right), avoid overlapping header/top-right metrics
+        self._draw_team_panel(screen, sw, sh)
     
     def draw_result(self, screen, result: str):
         """Vẽ kết quả game (WIN/LOSE)"""
@@ -60,3 +73,36 @@ class HUD:
             text_surface = self.big_font.render(result, True, COLOR_HILIGHT)
             sw, _ = screen.get_size()
             screen.blit(text_surface, text_surface.get_rect(center=(sw//2, 56)))
+
+    def _draw_team_panel(self, screen, sw: int, sh: int):
+        """Vẽ panel hiển thị thông tin nhóm ở góc phải dưới, không che nội dung chính."""
+        group_title = "Team 09"
+        group_lines = [
+            "251ARIN330585_03CLC_AI_Project",
+            "23110110 - Lê Quang Hưng",
+            "23110078 - Nguyễn Thái Bảo",
+            "23110111 - Lương Nguyễn Thành Hưng",
+        ]
+        
+        pad_x, pad_y = 14, 10
+        title_surf = self.small_font.render(group_title, True, self.color_panel_title)
+        line_surfs = [self.small_font.render(t, True, self.color_panel_text) for t in group_lines]
+        content_width = max([title_surf.get_width(), *[s.get_width() for s in line_surfs]])
+        content_height = title_surf.get_height() + 6 + sum(s.get_height() for s in line_surfs) + (len(line_surfs) - 1) * 2
+        panel_width = content_width + pad_x * 2
+        panel_height = content_height + pad_y * 2
+        panel_x = sw - panel_width - 20
+        panel_y = sh - panel_height - 20
+        
+        # Semi-transparent background and border
+        panel_surface = pygame.Surface((panel_width, panel_height), pygame.SRCALPHA)
+        panel_surface.fill(self.color_panel_bg)
+        pygame.draw.rect(panel_surface, self.color_panel_border, panel_surface.get_rect(), width=2, border_radius=8)
+        screen.blit(panel_surface, (panel_x, panel_y))
+        
+        # Content
+        screen.blit(title_surf, (panel_x + pad_x, panel_y + pad_y))
+        y = panel_y + pad_y + title_surf.get_height() + 6
+        for s in line_surfs:
+            screen.blit(s, (panel_x + pad_x, y))
+            y += s.get_height() + 2
