@@ -134,9 +134,13 @@ def greedy_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
             if nxt in visited:
                 continue
 
-            # Heuristic: khoảng cách Manhattan đến G + số sao chưa thu thập
-            stars_left = len(stars) - bin(next_mask).count('1')
-            h_score = _manhattan_distance((nx, ny), goal) + stars_left
+            # Heuristic Greedy ưu tiên tiến về ngôi sao gần nhất, rồi tới G
+            remaining_stars = [s for s in stars if not (next_mask & (1 << star_index[s]))]
+            if remaining_stars:
+                nearest_star_dist = min(_manhattan_distance((nx, ny), s) for s in remaining_stars)
+                h_score = nearest_star_dist + _manhattan_distance((nx, ny), goal)
+            else:
+                h_score = _manhattan_distance((nx, ny), goal)
 
             heappush(queue, (h_score, nxt))
             visited.add(nxt)

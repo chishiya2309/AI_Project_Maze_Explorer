@@ -79,14 +79,14 @@ def ucs_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
     queue: List[Tuple[int, State]] = []
     parents: Dict[State, Tuple[Optional[State], str]] = {}
     g_scores: Dict[State, int] = {}  # Chi phí từ start đến state
-    visited: Set[State] = set()
+    closed_set: Set[State] = set()
     expanded_order: List[Position] = []
 
     start_state: State = (start[0], start[1], start_mask)
     heappush(queue, (0, start_state))
     parents[start_state] = (None, "")
     g_scores[start_state] = 0
-    visited.add(start_state)
+    # closed_set sẽ chứa các state đã pop ra và xử lý xong
 
     directions: List[Tuple[int, int, str]] = [
         (0, -1, "U"),
@@ -99,6 +99,10 @@ def ucs_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
 
     while queue:
         g_score, (x, y, mask) = heappop(queue)
+        # Bỏ qua nếu state này đã được đóng trước đó
+        if (x, y, mask) in closed_set:
+            continue
+        closed_set.add((x, y, mask))
         expanded_order.append((x, y))
 
         # Điều kiện thắng: đứng ở G và đã gom đủ sao
@@ -117,16 +121,17 @@ def ucs_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
                 next_mask = mask | (1 << star_index[pos])
 
             nxt: State = (nx, ny, next_mask)
-            if nxt in visited:
+            if nxt in closed_set:
                 continue
 
             # Tính chi phí g (từ start đến nxt)
             tentative_g = g_scores[(x, y, mask)] + 1
 
-            heappush(queue, (tentative_g, nxt))
-            visited.add(nxt)
-            parents[nxt] = ((x, y, mask), move)
-            g_scores[nxt] = tentative_g
+            # Chỉ cập nhật và đẩy vào heap nếu tìm thấy đường tốt hơn
+            if tentative_g < g_scores.get(nxt, float('inf')):
+                g_scores[nxt] = tentative_g
+                parents[nxt] = ((x, y, mask), move)
+                heappush(queue, (tentative_g, nxt))
 
     if end_state is None:
         return {
