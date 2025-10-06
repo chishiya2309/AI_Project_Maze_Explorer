@@ -1,6 +1,7 @@
 import pygame
 import time
 from core.scene import Scene
+from core.assets import load_image
 
 
 class HistoryScene(Scene):
@@ -17,26 +18,30 @@ class HistoryScene(Scene):
         self.hovered_record = -1
         self.dragging_scroll = False  # Track if user is dragging scroll bar
         
+        # Load background image
+        self.bg_image = load_image("history_background.png")
+        
         # Scroll settings
         self.records_per_page = 6  # Number of records visible at once
         self.card_height = 80
         self.card_spacing = 10
         self.max_scroll = max(0, len(self.recs) - self.records_per_page)
         
-        # Colors
-        self.color_bg = (20, 30, 40)  # Dark blue background
-        self.color_bg_pattern = (15, 25, 35)  # Darker blue for pattern
-        self.color_title = (255, 255, 255)  # White title
+        # Colors - Adjusted for better visibility over background
+        self.color_bg = (20, 30, 40)  # Dark blue background (fallback)
+        self.color_bg_pattern = (15, 25, 35)  # Darker blue for pattern (fallback)
+        self.color_title = (255, 255, 255)  # White title with shadow
         self.color_back_button = (100, 150, 255)  # Blue back button
         self.color_back_button_hover = (120, 170, 255)  # Lighter blue for hover
-        self.color_card_bg = (40, 50, 70)  # Dark blue card background
-        self.color_card_hover = (60, 80, 100)  # Lighter blue for hover
-        self.color_card_selected = (80, 120, 160)  # Even lighter for selected
+        self.color_card_bg = (40, 50, 70, 200)  # Semi-transparent card background
+        self.color_card_hover = (60, 80, 100, 220)  # Semi-transparent hover
+        self.color_card_selected = (80, 120, 160, 240)  # Semi-transparent selected
         self.color_card_text = (255, 255, 255)  # White text on cards
         self.color_card_border = (100, 150, 200)  # Border color
         self.color_success = (100, 255, 100)  # Green for success
         self.color_failure = (255, 100, 100)  # Red for failure
-        self.color_stats = (200, 200, 200)  # Gray for stats
+        self.color_stats = (220, 220, 220)  # Light gray for stats
+        self.color_shadow = (0, 0, 0, 150)  # Shadow color for text
     
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
@@ -227,15 +232,19 @@ class HistoryScene(Scene):
         self.scroll = max(0, self.scroll)
     
     def draw(self, screen):
-        # Background with pattern
-        screen.fill(self.color_bg)
         sw, sh = screen.get_size()
         
-        # Draw subtle pattern
-        for y in range(0, sh, 20):
-            for x in range(0, sw, 20):
-                if (x + y) % 40 == 0:
-                    pygame.draw.rect(screen, self.color_bg_pattern, (x, y, 20, 20))
+        # Draw background image first, scaled to screen size
+        if self.bg_image:
+            bg_scaled = pygame.transform.smoothscale(self.bg_image, (sw, sh))
+            screen.blit(bg_scaled, (0, 0))
+        else:
+            # Fallback background with pattern
+            screen.fill(self.color_bg)
+            for y in range(0, sh, 20):
+                for x in range(0, sw, 20):
+                    if (x + y) % 40 == 0:
+                        pygame.draw.rect(screen, self.color_bg_pattern, (x, y, 20, 20))
         
         # Back button
         back_rect = pygame.Rect(30, 30, 80, 40)
@@ -250,16 +259,25 @@ class HistoryScene(Scene):
         back_text_rect = back_text.get_rect(center=back_rect.center)
         screen.blit(back_text, back_text_rect)
         
-        # Title
+        # Title with shadow for better visibility
         title_text = self.font_title.render("Game History", True, self.color_title)
         title_rect = title_text.get_rect(center=(sw // 2, 80))
+        
+        # Draw shadow first
+        shadow_text = self.font_title.render("Game History", True, self.color_shadow[:3])
+        shadow_rect = shadow_text.get_rect(center=(sw // 2 + 2, 82))
+        screen.blit(shadow_text, shadow_rect)
+        
+        # Draw main title
         screen.blit(title_text, title_rect)
         
         if not self.recs:
-            # Empty state
+            # Empty state with semi-transparent background
             empty_rect = pygame.Rect(50, 120, sw - 100, 200)
-            pygame.draw.rect(screen, self.color_card_bg, empty_rect, border_radius=12)
-            pygame.draw.rect(screen, self.color_card_border, empty_rect, 2, border_radius=12)
+            empty_surface = pygame.Surface((empty_rect.width, empty_rect.height), pygame.SRCALPHA)
+            pygame.draw.rect(empty_surface, self.color_card_bg, (0, 0, empty_rect.width, empty_rect.height), border_radius=12)
+            pygame.draw.rect(empty_surface, self.color_card_border, (0, 0, empty_rect.width, empty_rect.height), 2, border_radius=12)
+            screen.blit(empty_surface, empty_rect)
             
             empty_text = self.font_card.render("No game records found", True, self.color_card_text)
             empty_text_rect = empty_text.get_rect(center=empty_rect.center)
@@ -302,9 +320,11 @@ class HistoryScene(Scene):
                 border_color = self.color_card_border
                 border_width = 2
             
-            # Draw card background
-            pygame.draw.rect(screen, card_color, card_rect, border_radius=12)
-            pygame.draw.rect(screen, border_color, card_rect, border_width, border_radius=12)
+            # Draw card background with semi-transparency
+            card_surface = pygame.Surface((card_width, card_height), pygame.SRCALPHA)
+            pygame.draw.rect(card_surface, card_color, (0, 0, card_width, card_height), border_radius=12)
+            pygame.draw.rect(card_surface, border_color, (0, 0, card_width, card_height), border_width, border_radius=12)
+            screen.blit(card_surface, card_rect)
             
             # Draw record content
             self._draw_record_content(screen, record, card_rect, i)
@@ -368,7 +388,7 @@ class HistoryScene(Scene):
         if not self.recs or len(self.recs) <= self.records_per_page:
             return
         
-        # Draw scroll bar
+        # Draw scroll bar with semi-transparency
         scroll_bar_x = sw - 20
         scroll_bar_y = 120
         scroll_bar_height = sh - 200
@@ -376,7 +396,9 @@ class HistoryScene(Scene):
         
         # Background of scroll bar
         scroll_bg_rect = pygame.Rect(scroll_bar_x, scroll_bar_y, scroll_bar_width, scroll_bar_height)
-        pygame.draw.rect(screen, (60, 80, 100), scroll_bg_rect, border_radius=4)
+        scroll_bg_surface = pygame.Surface((scroll_bar_width, scroll_bar_height), pygame.SRCALPHA)
+        pygame.draw.rect(scroll_bg_surface, (60, 80, 100, 150), (0, 0, scroll_bar_width, scroll_bar_height), border_radius=4)
+        screen.blit(scroll_bg_surface, scroll_bg_rect)
         
         # Calculate scroll thumb position
         scroll_ratio = self.scroll / self.max_scroll if self.max_scroll > 0 else 0
@@ -385,15 +407,21 @@ class HistoryScene(Scene):
         
         # Draw scroll thumb
         thumb_rect = pygame.Rect(scroll_bar_x, thumb_y, scroll_bar_width, thumb_height)
-        pygame.draw.rect(screen, (120, 170, 220), thumb_rect, border_radius=4)
+        thumb_surface = pygame.Surface((scroll_bar_width, thumb_height), pygame.SRCALPHA)
+        pygame.draw.rect(thumb_surface, (120, 170, 220, 200), (0, 0, scroll_bar_width, thumb_height), border_radius=4)
+        screen.blit(thumb_surface, thumb_rect)
         
-        # Draw position info
+        # Draw position info with shadow
         position_text = f"{self.scroll + 1}-{min(self.scroll + self.records_per_page, len(self.recs))} of {len(self.recs)}"
+        position_shadow = self.font_tiny.render(position_text, True, self.color_shadow[:3])
         position_surface = self.font_tiny.render(position_text, True, self.color_stats)
+        screen.blit(position_shadow, (sw - 151, sh - 29))
         screen.blit(position_surface, (sw - 150, sh - 30))
         
-        # Draw navigation hints
+        # Draw navigation hints with shadow
         if len(self.recs) > self.records_per_page:
             hint_text = "↑/↓ Navigate • PgUp/PgDn Scroll • Home/End Jump • Mouse Wheel"
+            hint_shadow = self.font_tiny.render(hint_text, True, self.color_shadow[:3])
             hint_surface = self.font_tiny.render(hint_text, True, self.color_stats)
+            screen.blit(hint_shadow, (51, sh - 29))
             screen.blit(hint_surface, (50, sh - 30))
