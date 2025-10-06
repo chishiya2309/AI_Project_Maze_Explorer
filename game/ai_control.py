@@ -9,6 +9,7 @@ from algorithms.UCS import ucs_collect_all_stars_with_trace
 class AIController:
     def __init__(self):
         self.active: Optional[str] = None  # "BFS" | "AStar" | "Greedy" | "DFS" | "UCS" | others in tương lai
+        self.display_active: Optional[str] = None  # luôn giữ tên thuật toán để hiển thị
         self.moves: List[str] = []
         self.move_index: int = 0
         # Tracing
@@ -21,6 +22,7 @@ class AIController:
         self.nodes_expanded: int = 0  # Số nút đã duyệt
 
     def reset(self):
+        # Không xóa display_active để vẫn hiển thị tên thuật toán đã chọn
         self.active = None
         self.moves = []
         self.move_index = 0
@@ -132,27 +134,33 @@ class AIController:
         if e.key == pygame.K_1:
             level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.active = "BFS"
+            self.display_active = "BFS"
             self._compute_bfs(level_scene)
         elif e.key == pygame.K_2:
             level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.active = "DFS"
+            self.display_active = "DFS"
             self._compute_dfs(level_scene)
         elif e.key == pygame.K_3:
             level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.active = "UCS"
+            self.display_active = "UCS"
             self._compute_ucs(level_scene)
         elif e.key == pygame.K_4:
             level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.active = "Greedy"
+            self.display_active = "Greedy"
             self._compute_greedy(level_scene)
         elif e.key == pygame.K_5:
             level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.active = "AStar"
+            self.display_active = "AStar"
             self._compute_astar(level_scene)
         elif e.key in (pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9, pygame.K_0):
             # Chưa có, tắt AI để người chơi điều khiển
             level_scene.reset_game_state()  # Reset game về trạng thái ban đầu
             self.reset()
+            self.display_active = None
 
     def get_next_step(self) -> Optional[Tuple[int, int]]:
         """Trả về (dx, dy) bước tiếp theo theo AI, hoặc None nếu không có/đã xong."""

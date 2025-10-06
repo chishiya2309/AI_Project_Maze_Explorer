@@ -79,6 +79,10 @@ class LevelScene(Scene):
         self.font_ai = pygame.font.SysFont("segoeui", 18, bold=True)
         # Font hiển thị thông tin nhóm
         self.font_group = pygame.font.SysFont("segoeui", 14)
+        # Font cho nút Next Level
+        self.font_button = pygame.font.SysFont("segoeui", 24, bold=True)
+        # Trạng thái hover nút Next
+        self._hover_next = False
 
     def _recompute_layout(self):
         """Recompute tile size and offsets to center the grid for current screen."""
@@ -144,6 +148,13 @@ class LevelScene(Scene):
                     from game.scenes import LevelSelectScene
                     self.game.scenes.switch(LevelSelectScene(self.game))
                     return
+                # Nếu đã thắng và không phải Level 8: kiểm tra nút Next Level
+                if self.result == "WIN" and self.name != "Level 8":
+                    sw, sh = self.game.screen.get_size()
+                    next_rect = pygame.Rect(sw - 140, sh - 60, 120, 40)
+                    if next_rect.collidepoint(mouse_x, mouse_y):
+                        self._go_next_level()
+                        return
         elif e.type == pygame.VIDEORESIZE:
             self._recompute_layout()
         elif e.type == pygame.MOUSEWHEEL:
@@ -154,15 +165,19 @@ class LevelScene(Scene):
             self._recompute_layout()
         # Bắt phím chọn thuật toán (1 = BFS; số khác: tắt AI)
         self.ai.handle_event(e, self)
+        # Cập nhật hover cho nút Next khi đã thắng
+        if e.type == pygame.MOUSEMOTION:
+            if self.result == "WIN" and self.name != "Level 8":
+                mx, my = e.pos
+                sw, sh = self.game.screen.get_size()
+                next_rect = pygame.Rect(sw - 140, sh - 60, 120, 40)
+                self._hover_next = next_rect.collidepoint(mx, my)
 
     def update(self, dt):
+        # Nếu đã thắng: dừng thời gian và không xử lý di chuyển, chờ người chơi chọn
         if self.result:
-            self.timer -= dt
-            if self.timer <= 0:
-                from game.scenes import LevelSelectScene
-                self.game.scenes.switch(LevelSelectScene(self.game))
             return
-        
+
         self.time_elapsed += dt
         keys = pygame.key.get_pressed()
         self.cool -= dt
@@ -249,7 +264,8 @@ class LevelScene(Scene):
             self.game.scenes.switch(EndingScene(self.game))
             # Vẫn ghi lại record trước khi chuyển cảnh
         else:
-            self.timer = 1200
+            # Không auto quay về; hiển thị nút Next Level
+            self.timer = 0
         
         # Ghi lại record
         rec = PlayRecord(
@@ -426,9 +442,23 @@ class LevelScene(Scene):
         # Vẽ kết quả
         self.hud.draw_result(screen, self.result)
 
+        # Nếu đã thắng và không phải Level 8: vẽ nút Next Level ở góc dưới bên phải
+        if self.result == "WIN" and self.name != "Level 8":
+            sw, sh = screen.get_size()
+            next_rect = pygame.Rect(sw - 140, sh - 60, 120, 40)
+            btn_color = (100, 200, 100) if not self._hover_next else (120, 220, 120)
+            pygame.draw.rect(screen, btn_color, next_rect, border_radius=8)
+            # Viền nhấn khi hover
+            if self._hover_next:
+                pygame.draw.rect(screen, (150, 250, 150), next_rect, 2, border_radius=8)
+            label = self.font_button.render("Next Level", True, (255, 255, 255))
+            label_rect = label.get_rect(center=next_rect.center)
+            screen.blit(label, label_rect)
+
         # Hiển thị trạng thái AI (phía dưới header level, bên phải)
-        if self.ai.active:
-            label = "thuật toán BFS" if self.ai.active == "BFS" else f"AI: {self.ai.active}"
+        # Luôn hiển thị tên thuật toán đã chọn gần đây (nếu có)
+        if getattr(self.ai, 'display_active', None):
+            label = f"AI: {self.ai.display_active}"
             surf = self.font_ai.render(label, True, (255, 255, 255))
             sw, sh = screen.get_size()
             rect = surf.get_rect()
@@ -455,3 +485,24 @@ class LevelScene(Scene):
         for i, line_text in enumerate(group_lines):
             group_surface = self.font_group.render(line_text, True, (150, 150, 150))
             screen.blit(group_surface, (20, start_y + i * line_height))
+
+    def _go_next_level(self):
+        """Chuyển sang level kế tiếp nếu có (không áp dụng cho Level 8)."""
+        try:
+            # Parse số level từ self.name dạng "Level N"
+            parts = self.name.strip().split()
+            cur_idx = int(parts[-1])  # N hiện tại (1-based)
+        except Exception:
+            return
+        next_idx = cur_idx + 1
+        # Không áp dụng cho Level 8
+        if next_idx > 8:
+            return
+        from core.assets import scan_levels
+        levels = scan_levels("data/levels")
+        # Index trong danh sách là 0-based, file được scan theo thứ tự
+        if 1 <= next_idx <= len(levels):
+            _, next_rows = levels[next_idx - 1]
+            from game.level import LevelScene
+            self.game.scenes.switch(LevelScene(self.game, f"Level {next_idx}", next_rows))
+
