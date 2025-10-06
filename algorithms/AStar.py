@@ -42,6 +42,105 @@ def _is_blocked(rows: List[str], x: int, y: int, width: int, height: int) -> boo
         return True
     return rows[y][x] == "1"
 
+def _bfs_distance(rows: List[str], start: Position, width: int, height: int) -> Dict[Position, int]:
+    """Tính khoảng cách BFS từ start đến tất cả các ô trong lưới."""
+    distances: Dict[Position, int] = {}
+    queue = deque([(start, 0)])
+    visited: Set[Position] = {start}
+    
+    directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+    
+    while queue:
+        (x, y), dist = queue.popleft()
+        distances[(x, y)] = dist
+        
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            if (nx, ny) not in visited and not _is_blocked(rows, nx, ny, width, height):
+                visited.add((nx, ny))
+                queue.append(((nx, ny), dist + 1))
+    
+    return distances
+
+def _precompute_distances(rows: List[str], start: Position, goal: Position, stars: List[Position], width: int, height: int) -> Dict[Tuple[Position, Position], int]:
+    """Tiền xử lý khoảng cách BFS giữa tất cả POI (S, G, stars)."""
+    poi_list = [start, goal] + stars
+    poi_to_index = {poi: i for i, poi in enumerate(poi_list)}
+    distances: Dict[Tuple[Position, Position], int] = {}
+    
+    # Tính khoảng cách từ mỗi POI đến tất cả các ô
+    poi_distances = {}
+    for poi in poi_list:
+        poi_distances[poi] = _bfs_distance(rows, poi, width, height)
+    
+    # Lưu khoảng cách giữa các POI
+    for i, poi1 in enumerate(poi_list):
+        for j, poi2 in enumerate(poi_list):
+            if i != j:
+                if poi2 in poi_distances[poi1]:
+                    distances[(poi1, poi2)] = poi_distances[poi1][poi2]
+                else:
+                    # Nếu không thể đến được, dùng khoảng cách Manhattan làm upper bound
+                    distances[(poi1, poi2)] = abs(poi1[0] - poi2[0]) + abs(poi1[1] - poi2[1])
+    
+    return distances
+
+def _get_distance(distances: Dict[Tuple[Position, Position], int], pos1: Position, pos2: Position) -> int:
+    """Lấy khoảng cách giữa hai vị trí từ ma trận đã tính sẵn."""
+    if (pos1, pos2) in distances:
+        return distances[(pos1, pos2)]
+    elif (pos2, pos1) in distances:
+        return distances[(pos2, pos1)]
+    else:
+        # Fallback: Manhattan distance
+        return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+
+def _compute_mst_weight(remaining_stars: List[Position], distances: Dict[Tuple[Position, Position], int]) -> int:
+    """Tính trọng số MST của các sao còn lại bằng thuật toán Prim."""
+    if not remaining_stars:
+        return 0
+    if len(remaining_stars) == 1:
+        return 0
+    
+    # Sử dụng Prim's algorithm
+    mst_weight = 0
+    visited: Set[Position] = {remaining_stars[0]}
+    remaining = set(remaining_stars[1:])
+    
+    while remaining:
+        min_dist = float('inf')
+        min_star = None
+        
+        for visited_star in visited:
+            for remaining_star in remaining:
+                dist = _get_distance(distances, visited_star, remaining_star)
+                if dist < min_dist:
+                    min_dist = dist
+                    min_star = remaining_star
+        
+        if min_star is not None:
+            mst_weight += min_dist
+            visited.add(min_star)
+            remaining.remove(min_star)
+    
+    return mst_weight
+
+def _compute_heuristic_mst(current_pos: Position, remaining_stars: List[Position], goal: Position, distances: Dict[Tuple[Position, Position], int]) -> int:
+    """Tính heuristic MST admissible: d(cur, R) + MST(R) + d(R, G)."""
+    if not remaining_stars:
+        return _get_distance(distances, current_pos, goal)
+    
+    # d(cur, R): khoảng cách ngắn nhất từ vị trí hiện tại đến một sao trong R
+    min_dist_to_stars = min(_get_distance(distances, current_pos, star) for star in remaining_stars)
+    
+    # MST(R): trọng số cây khung nhỏ nhất của các sao còn lại
+    mst_weight = _compute_mst_weight(remaining_stars, distances)
+    
+    # d(R, G): khoảng cách ngắn nhất từ một sao trong R đến goal
+    min_dist_stars_to_goal = min(_get_distance(distances, star, goal) for star in remaining_stars)
+    
+    return min_dist_to_stars + mst_weight + min_dist_stars_to_goal
+
 def _reconstruct_path(
     parents: Dict[State, Tuple[Optional[State], str]],
     end_state: State,
@@ -62,12 +161,8 @@ def _reconstruct_path(
     moves_rev.reverse()
     return path_rev, moves_rev
 
-def _manhattan_distance(p1: Position, p2: Position) -> int:
-    """Tính khoảng cách Manhattan giữa hai điểm."""
-    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
-
 def astar_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
-    """Tìm đường đi ngắn nhất bằng A*: thu thập hết sao rồi tới cửa (G).
+    """Tìm đường đi ngắn nhất bằng A* với heuristic MST admissible.
 
     - Input: rows (danh sách chuỗi ký tự của level)
     - Output: dict gồm:
@@ -82,6 +177,9 @@ def astar_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
     """
     start, goal, stars, width, height = _parse_level(rows)
 
+    # Tiền xử lý khoảng cách BFS
+    distances = _precompute_distances(rows, start, goal, stars, width, height)
+    
     # Ánh xạ vị trí sao -> bit index
     star_index: Dict[Position, int] = {pos: i for i, pos in enumerate(stars)}
     all_mask = (1 << len(stars)) - 1
@@ -93,16 +191,34 @@ def astar_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
     queue: List[Tuple[int, State]] = []
     parents: Dict[State, Tuple[Optional[State], str]] = {}
     g_scores: Dict[State, int] = {}  # Chi phí từ start đến state
-    visited: Set[State] = set()
+    closed_set: Set[State] = set()  # Các state đã "đóng"
     expanded_order: List[Position] = []
 
     start_state: State = (start[0], start[1], start_mask)
-    # Heuristic: khoảng cách Manhattan đến G + số sao chưa thu thập
-    h_score = _manhattan_distance(start, goal) + len(stars)
+    
+    # Cache cho MST theo mask để tối ưu
+    mst_cache: Dict[int, int] = {}
+    
+    def get_heuristic(state: State) -> int:
+        """Tính heuristic MST cho state hiện tại."""
+        x, y, mask = state
+        current_pos = (x, y)
+        
+        # Lấy danh sách sao còn lại
+        remaining_stars = [stars[i] for i in range(len(stars)) if not (mask & (1 << i))]
+        
+        # Kiểm tra cache MST
+        cache_key = mask
+        if cache_key not in mst_cache:
+            mst_cache[cache_key] = _compute_mst_weight(remaining_stars, distances)
+        
+        return _compute_heuristic_mst(current_pos, remaining_stars, goal, distances)
+    
+    # Khởi tạo
+    h_score = get_heuristic(start_state)
     heappush(queue, (h_score, start_state))
     parents[start_state] = (None, "")
     g_scores[start_state] = 0
-    visited.add(start_state)
 
     directions: List[Tuple[int, int, str]] = [
         (0, -1, "U"),
@@ -115,6 +231,12 @@ def astar_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
 
     while queue:
         _, (x, y, mask) = heappop(queue)
+        
+        # Bỏ qua nếu đã xử lý state này
+        if (x, y, mask) in closed_set:
+            continue
+            
+        closed_set.add((x, y, mask))
         expanded_order.append((x, y))
 
         # Điều kiện thắng: đứng ở G và đã gom đủ sao
@@ -133,21 +255,24 @@ def astar_collect_all_stars_with_trace(rows: List[str]) -> Dict[str, object]:
                 next_mask = mask | (1 << star_index[pos])
 
             nxt: State = (nx, ny, next_mask)
-            if nxt in visited:
+            
+            # Bỏ qua nếu đã đóng
+            if nxt in closed_set:
                 continue
 
             # Tính chi phí g (từ start đến nxt)
             tentative_g = g_scores[(x, y, mask)] + 1
 
-            # Heuristic: khoảng cách Manhattan đến G + số sao chưa thu thập
-            stars_left = len(stars) - bin(next_mask).count('1')
-            h_score = _manhattan_distance((nx, ny), goal) + stars_left
-            f_score = tentative_g + h_score
-
-            heappush(queue, (f_score, nxt))
-            visited.add(nxt)
-            parents[nxt] = ((x, y, mask), move)
-            g_scores[nxt] = tentative_g
+            # Chỉ cập nhật nếu tìm được đường tốt hơn
+            if tentative_g < g_scores.get(nxt, float('inf')):
+                g_scores[nxt] = tentative_g
+                parents[nxt] = ((x, y, mask), move)
+                
+                # Tính f_score với heuristic MST
+                h_score = get_heuristic(nxt)
+                f_score = tentative_g + h_score
+                
+                heappush(queue, (f_score, nxt))
 
     if end_state is None:
         return {
