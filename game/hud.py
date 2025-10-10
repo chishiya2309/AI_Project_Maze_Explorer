@@ -80,7 +80,7 @@ class HUD:
     def _draw_algorithm_panel(self, screen, sw: int, sh: int):
         """Vẽ panel chọn thuật toán ở phía bên trái màn hình."""
         # Panel content
-        title = "Chọn thuật toán"
+        title = "Phím tắt chọn thuật toán"
         algorithms = [
             "1 - BFS",
             "2 - DFS", 
