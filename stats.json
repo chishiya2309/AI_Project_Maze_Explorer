@@ -503,6 +503,90 @@
       "steps": 106,
       "solver": "UCS",
       "nodes_expanded": 1533
+    },
+    {
+      "ts": 1760111802.7671034,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 17,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 106,
+      "solver": "AStar",
+      "nodes_expanded": 341
+    },
+    {
+      "ts": 1760111894.021412,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 37,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 106,
+      "solver": "BFS",
+      "nodes_expanded": 1524
+    },
+    {
+      "ts": 1760112015.962521,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 40,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 296,
+      "solver": "DFS",
+      "nodes_expanded": 399
+    },
+    {
+      "ts": 1760112142.4670923,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 37,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 106,
+      "solver": "UCS",
+      "nodes_expanded": 1533
+    },
+    {
+      "ts": 1760112286.258194,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 40,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 296,
+      "solver": "DFS",
+      "nodes_expanded": 399
+    },
+    {
+      "ts": 1760112356.5284228,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 17,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 118,
+      "solver": "Greedy",
+      "nodes_expanded": 253
+    },
+    {
+      "ts": 1760112719.8552012,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 17,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 106,
+      "solver": "AStar",
+      "nodes_expanded": 341
     }
   ]
 }
