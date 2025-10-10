@@ -64,6 +64,9 @@ class HUD:
             expanded_rect = expanded_text.get_rect(topright=(sw - 20, 220))
             screen.blit(expanded_text, expanded_rect)
         
+        # Algorithm selection panel (left side)
+        self._draw_algorithm_panel(screen, sw, sh)
+        
         # Team panel (bottom-right), avoid overlapping header/top-right metrics
         self._draw_team_panel(screen, sw, sh)
     
@@ -73,6 +76,45 @@ class HUD:
             text_surface = self.big_font.render(result, True, COLOR_HILIGHT)
             sw, _ = screen.get_size()
             screen.blit(text_surface, text_surface.get_rect(center=(sw//2, 56)))
+
+    def _draw_algorithm_panel(self, screen, sw: int, sh: int):
+        """Vẽ panel chọn thuật toán ở phía bên trái màn hình."""
+        # Panel content
+        title = "Chọn thuật toán"
+        algorithms = [
+            "1 - BFS",
+            "2 - DFS", 
+            "3 - UCS",
+            "4 - Greedy",
+            "5 - A*"
+        ]
+        
+        pad_x, pad_y = 12, 8
+        title_surf = self.instruction_font.render(title, True, (255, 255, 255))
+        algo_surfs = [self.small_font.render(algo, True, (200, 220, 240)) for algo in algorithms]
+        
+        # Calculate panel dimensions
+        content_width = max([title_surf.get_width(), *[s.get_width() for s in algo_surfs]])
+        content_height = title_surf.get_height() + 8 + sum(s.get_height() for s in algo_surfs) + (len(algo_surfs) - 1) * 4
+        panel_width = content_width + pad_x * 2
+        panel_height = content_height + pad_y * 2
+        
+        # Position panel on left side, below header
+        panel_x = 20
+        panel_y = 100  # Below header (80px) + margin
+        
+        # Semi-transparent background and border
+        panel_surface = pygame.Surface((panel_width, panel_height), pygame.SRCALPHA)
+        panel_surface.fill((0, 0, 0, 120))  # Dark semi-transparent background
+        pygame.draw.rect(panel_surface, (100, 150, 255), panel_surface.get_rect(), width=2, border_radius=6)
+        screen.blit(panel_surface, (panel_x, panel_y))
+        
+        # Draw content
+        screen.blit(title_surf, (panel_x + pad_x, panel_y + pad_y))
+        y = panel_y + pad_y + title_surf.get_height() + 8
+        for surf in algo_surfs:
+            screen.blit(surf, (panel_x + pad_x, y))
+            y += surf.get_height() + 4
 
     def _draw_team_panel(self, screen, sw: int, sh: int):
         """Vẽ panel hiển thị thông tin nhóm ở góc phải dưới, không che nội dung chính."""

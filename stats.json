@@ -1,5 +1,5 @@
 {
-  "records": [     
+  "records": [
     {
       "ts": 1759755780.1584992,
       "level_name": "Level 1",
@@ -479,6 +479,30 @@
       "steps": 184,
       "solver": "AStar",
       "nodes_expanded": 711
+    },
+    {
+      "ts": 1759996650.9022639,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 17,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 106,
+      "solver": "AStar",
+      "nodes_expanded": 341
+    },
+    {
+      "ts": 1759996782.5511394,
+      "level_name": "Level 1",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 37,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 106,
+      "solver": "UCS",
+      "nodes_expanded": 1533
     }
   ]
 }
