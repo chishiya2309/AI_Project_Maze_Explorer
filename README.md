@@ -6,8 +6,9 @@
 
 ## 🎥 Demo Video
 
-> **[Insert Demo Video Here]**
-> *(Bạn có thể kéo thả video demo hoặc chèn link YouTube vào đây / You can drag and drop your demo video or insert a YouTube link here)*
+https://github.com/user-attachments/assets/b35afd27-ba63-4c33-9da1-94408e466de0
+
+https://github.com/user-attachments/assets/e9cebc3f-66f8-4f30-ae47-e7574eff682c
 
 ---
 
