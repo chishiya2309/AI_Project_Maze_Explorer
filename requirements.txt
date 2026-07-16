@@ -1,5 +1,5 @@
 # Core game dependencies
-pygame>=2.1.0
+pygame-ce>=2.1.0
 
 # Video playback support (for ending scene)
 opencv-python>=4.5.0
