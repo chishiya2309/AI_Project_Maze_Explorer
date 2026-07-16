@@ -587,6 +587,18 @@
       "steps": 106,
       "solver": "AStar",
       "nodes_expanded": 341
+    },
+    {
+      "ts": 1784198987.929896,
+      "level_name": "Level 8",
+      "result": "WIN",
+      "score": 30,
+      "time_elapsed_sec": 32,
+      "stars_collected": 3,
+      "stars_total": 3,
+      "steps": 184,
+      "solver": "AStar",
+      "nodes_expanded": 711
     }
   ]
 }
